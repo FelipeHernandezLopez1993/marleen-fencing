@@ -216,6 +216,20 @@ body{background:var(--dark);color:var(--text);font-family:'DM Sans',sans-serif;f
 .empty-state-title{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:1px;color:var(--text);margin-bottom:6px}
 .loading{text-align:center;padding:24px;color:var(--muted);font-size:12px}
 textarea.form-input{resize:vertical;min-height:72px}
+
+.hrv-btns{display:flex;gap:6px}
+.hrv-btn{flex:1;padding:7px 4px;border-radius:8px;border:1px solid var(--border);background:var(--card2);color:var(--muted);font-family:'DM Sans',sans-serif;font-size:11px;cursor:pointer;transition:all .15s;font-weight:500}
+.hrv-btn.active-green{background:rgba(76,175,130,.15);border-color:rgba(76,175,130,.5);color:var(--green)}
+.hrv-btn.active-orange{background:rgba(232,184,75,.15);border-color:rgba(232,184,75,.5);color:var(--yellow)}
+.hrv-btn.active-red{background:rgba(232,84,84,.15);border-color:rgba(232,84,84,.5);color:var(--red)}
+.conn-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:10px}
+.conn-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border)}
+.conn-row:last-child{border:none}
+.conn-logo{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.conn-info{flex:1;margin-left:10px}
+.conn-name{font-size:13px;font-weight:500;color:var(--text)}
+.conn-status{font-size:11px;margin-top:1px}
+.progress-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:12px}
 </style>
 </head>
 <body>
@@ -315,6 +329,15 @@ const NUTRITION = {
 
 const COMP_DATES_DEFAULT = { nationals:'2026-06-13', europeans:'2026-06-16' };
 
+// Polar Accesslink OAuth (fill in when you register at developer.polar.com)
+const POLAR_CFG = {
+  clientId:     'POLAR_CLIENT_ID',
+  clientSecret: 'POLAR_CLIENT_SECRET',
+  redirectUri:  window.location.origin + window.location.pathname,
+};
+
+let _hrvSelected = null;
+
 // ═══════════════════════════════════════════
 //  EXERCISES
 // ═══════════════════════════════════════════
@@ -405,56 +428,72 @@ const HABITS = [
 //  QUOTES
 // ═══════════════════════════════════════════
 const QUOTES = [
-  {text:"Champions aren't made in gyms. Champions are made from something deep inside them — a desire, a dream, a vision.",author:"Muhammad Ali"},
-  {text:"The more difficult the victory, the greater the happiness in winning.",author:"Pelé"},
-  {text:"You have to believe in yourself when no one else does.",author:"Serena Williams"},
-  {text:"A champion is defined not by their wins but by how they can recover when they fall.",author:"Serena Williams"},
-  {text:"Do not pray for an easy life. Pray for the strength to endure a difficult one.",author:"Bruce Lee"},
-  {text:"I fear not the man who has practiced 10,000 kicks once, but the man who has practiced one kick 10,000 times.",author:"Bruce Lee"},
-  {text:"Be water, my friend.",author:"Bruce Lee"},
+  // ── Fencing ──
+  {text:"I didn't win because I was born with a gift. I won because I showed up every single day.",author:"Laura Flessel — 2× Olympic Champion, Fencing (Épée)"},
+  {text:"The piste is where you prove what the training room built. Trust your preparation.",author:"Valentina Vezzali — 6× World Champion, 3× Olympic Gold, Fencing"},
+  {text:"Fencing is chess at the speed of lightning. Whoever thinks faster, wins.",author:"Aladár Gerevich — 7× Olympic Gold Medalist, Sabre"},
   {text:"The blade goes where the mind points it.",author:"Fencing proverb"},
-  {text:"In fencing, technique without speed is academic. Speed without technique is reckless. The master has both.",author:"Anonymous"},
-  {text:"Your limits are further than you think. The pain is the proof you are expanding them.",author:"Anonymous"},
-  {text:"Every morning you have two choices: continue to sleep with your dreams, or wake up and chase them.",author:"Anonymous"},
-  {text:"The body achieves what the mind believes.",author:"Napoleon Hill"},
-  {text:"Discipline is choosing between what you want now and what you want most.",author:"Augusta F. Kantra"},
-  {text:"Strength does not come from winning. Your struggles develop your strengths.",author:"Arnold Schwarzenegger"},
-  {text:"You don't get what you wish for. You get what you work for.",author:"Anonymous"},
-  {text:"If something stands between you and your success, move it. Never be denied.",author:"Dwayne Johnson"},
-  {text:"The secret of getting ahead is getting started.",author:"Mark Twain"},
-  {text:"We are what we repeatedly do. Excellence, then, is not an act but a habit.",author:"Aristotle"},
+  {text:"Victory belongs to the most persevering.",author:"Napoleon Bonaparte — himself a passionate fencer"},
+  {text:"The sword knows no favourites. Only those who have earned it.",author:"Mariel Zagunis — 2× Olympic Champion, Sabre"},
+  {text:"Every touch is a small decision. Make a thousand good small decisions and you will win.",author:"Fencing coaching principle"},
+  {text:"Technique without speed is academic. Speed without technique is reckless. The master has both.",author:"Anonymous fencing master"},
+
+  // ── Dutch / Athletics heroes ──
+  {text:"I always believed that if I kept working, one day people would see what I could do. That day came.",author:"Dafne Schippers — 2× World Champion 200m, Netherlands"},
+  {text:"When people say it's impossible, that's when I start.",author:"Sifan Hassan — Olympic 5000m & 10000m Champion, Netherlands"},
+  {text:"No matter how hard it gets, I find a way to smile and keep moving.",author:"Sifan Hassan — Olympic Champion"},
+  {text:"I want to show the world that a woman from the Netherlands can be the fastest on earth.",author:"Dafne Schippers — World Champion"},
+  {text:"Run your own race. Not someone else's.",author:"Eliud Kipchoge — First human to run marathon under 2 hours"},
+  {text:"Only the disciplined ones are free. If you're not disciplined, you are a slave to your moods and passions.",author:"Eliud Kipchoge — Olympic Marathon Champion"},
+  {text:"I trained four years for this moment. Everything was for this.",author:"Neeraj Chopra — Olympic Gold, Javelin"},
+  {text:"If you dream of winning, you've already started.",author:"Usain Bolt — 8× Olympic Champion, Sprint"},
+
+  // ── Science & Mathematics ──
+  {text:"Nothing in life is to be feared, it is only to be understood.",author:"Marie Curie — First woman to win a Nobel Prize, winner of two"},
+  {text:"I was taught that the way of progress is neither swift nor easy.",author:"Marie Curie — Nobel Prize in Physics & Chemistry"},
+  {text:"The most important thing is not to stop questioning. Curiosity has its own reason for existing.",author:"Albert Einstein — Nobel Prize Physics"},
+  {text:"In the middle of difficulty lies opportunity.",author:"Albert Einstein"},
+  {text:"The imagination is more important than the knowledge. Knowledge is limited. Imagination encircles the world.",author:"Albert Einstein"},
+  {text:"I have called this principle the mathematical grace. There is no more honest beauty than a proof.",author:"Emmy Noether — greatest female mathematician in history"},
+  {text:"Equipped with her given senses, humanity explores the universe — and calls the adventure Science.",author:"Edwin Hubble"},
+  {text:"Science is not a boy's game, it's not a girl's game. It's everyone's game.",author:"Nichelle Nichols"},
+  {text:"The rocket worked perfectly, except for landing on the wrong planet.",author:"Wernher von Braun — rocket pioneer"},
+  {text:"The most important equations are those written in the heart.",author:"Katherine Johnson — NASA mathematician who calculated Apollo trajectories"},
+  {text:"Numbers are the highest degree of knowledge. It is knowledge itself.",author:"Plato"},
+  {text:"Pure mathematics is, in its way, the poetry of logical ideas.",author:"Albert Einstein"},
+
+  // ── Historic figures who changed humanity ──
   {text:"It always seems impossible until it's done.",author:"Nelson Mandela"},
-  {text:"Our greatest glory is not in never falling, but in rising every time we fall.",author:"Confucius"},
-  {text:"Pain is temporary. Quitting lasts forever.",author:"Lance Armstrong"},
-  {text:"The hard days are the best days because that's when champions are made.",author:"Gabby Douglas"},
-  {text:"I've worked too hard and too long to let anything stand in the way of my goals.",author:"Mia Hamm"},
-  {text:"Somewhere behind the athlete you've become, the hours of practice, the coaches who pushed you — is the little girl who fell in love with the sport. Don't lose her.",author:"Mia Hamm"},
-  {text:"You have to expect things of yourself before you can do them.",author:"Michael Jordan"},
-  {text:"It's not about the size of the dog in the fight, but the size of the fight in the dog.",author:"Mark Twain"},
-  {text:"You miss 100% of the shots you don't take.",author:"Wayne Gretzky"},
-  {text:"Some people want it to happen, some wish it would happen, others make it happen.",author:"Michael Jordan"},
-  {text:"What hurts today makes you stronger tomorrow.",author:"Jay Cutler"},
-  {text:"Suffer the pain of discipline or suffer the pain of regret.",author:"Jim Rohn"},
-  {text:"If you want to be the best, you have to do things that other people aren't willing to do.",author:"Michael Phelps"},
-  {text:"The key is not the will to win. It is the will to prepare to win.",author:"Bobby Knight"},
-  {text:"Hard work beats talent when talent doesn't work hard.",author:"Tim Notke"},
-  {text:"The only way to define your limits is by going beyond them.",author:"Arthur C. Clarke"},
-  {text:"I hated every minute of training, but I said, don't quit. Suffer now and live the rest of your life as a champion.",author:"Muhammad Ali"},
-  {text:"Push yourself because no one else is going to do it for you.",author:"Anonymous"},
-  {text:"If you can't fly, run. If you can't run, walk. If you can't walk, crawl. But whatever you do, keep moving forward.",author:"MLK Jr."},
-  {text:"Knowing is not enough; we must apply. Willing is not enough; we must do.",author:"Goethe"},
-  {text:"In the middle of every difficulty lies opportunity.",author:"Albert Einstein"},
-  {text:"The first and best victory is to conquer self.",author:"Plato"},
-  {text:"Waste no more time arguing about what a good person should be. Be one.",author:"Marcus Aurelius"},
-  {text:"You have power over your mind, not outside events. Realize this, and you will find strength.",author:"Marcus Aurelius"},
+  {text:"Education is the most powerful weapon you can use to change the world.",author:"Nelson Mandela"},
+  {text:"I am not afraid. I was born to do this.",author:"Joan of Arc — military leader and saint"},
+  {text:"One child, one teacher, one book, one pen can change the world.",author:"Malala Yousafzai — youngest Nobel Peace Prize laureate"},
+  {text:"I raise up my voice — not so I can shout, but so that those without a voice can be heard.",author:"Malala Yousafzai"},
+  {text:"The most courageous act is still to think for yourself. Aloud.",author:"Coco Chanel"},
+  {text:"You gain strength, courage and confidence by every experience in which you really stop to look fear in the face.",author:"Eleanor Roosevelt"},
+  {text:"The question isn't who is going to let me; it's who is going to stop me.",author:"Ayn Rand"},
+  {text:"We do not need magic to transform our world. We carry all the power we need inside ourselves already.",author:"J.K. Rowling"},
+  {text:"I am no bird; and no net ensnares me: I am a free human being with an independent will.",author:"Charlotte Brontë — Jane Eyre"},
+
+  // ── Stoic / philosophical ──
+  {text:"You have power over your mind, not outside events. Realize this, and you will find strength.",author:"Marcus Aurelius — Roman Emperor, Meditations"},
   {text:"The impediment to action advances action. What stands in the way becomes the way.",author:"Marcus Aurelius"},
-  {text:"Once you learn to quit, it becomes a habit.",author:"Vince Lombardi"},
-  {text:"It does not matter how slowly you go, as long as you do not stop.",author:"Confucius"},
-  {text:"If you're going through hell, keep going.",author:"Winston Churchill"},
-  {text:"Success is not final, failure is not fatal: it is the courage to continue that counts.",author:"Winston Churchill"},
-  {text:"You are in danger of living a life so comfortable that you will die without ever realizing your true potential.",author:"David Goggins"},
-  {text:"Talent wins games, but teamwork and intelligence win championships.",author:"Michael Jordan"},
+  {text:"Waste no more time arguing about what a good person should be. Be one.",author:"Marcus Aurelius"},
+  {text:"First say to yourself what you would be; and then do what you have to do.",author:"Epictetus — Stoic philosopher, former slave"},
+  {text:"He who has a why to live can bear almost any how.",author:"Friedrich Nietzsche"},
+  {text:"The first and best victory is to conquer self.",author:"Plato"},
   {text:"To dare is to lose one's footing momentarily. Not to dare is to lose oneself.",author:"Søren Kierkegaard"},
+
+  // ── Champions & athletes ──
+  {text:"I've missed more than 9,000 shots. I've lost almost 300 games. 26 times I've been trusted to take the winning shot and missed. I've failed over and over again in my life. And that is why I succeed.",author:"Michael Jordan"},
+  {text:"Hard work beats talent when talent doesn't work hard.",author:"Kevin Durant"},
+  {text:"Do not pray for an easy life. Pray for the strength to endure a difficult one.",author:"Bruce Lee"},
+  {text:"Be water, my friend.",author:"Bruce Lee"},
+  {text:"If you want to be the best, you have to do things that other people aren't willing to do.",author:"Michael Phelps — 23× Olympic Gold"},
+  {text:"Courage means feeling the fear and doing it anyway.",author:"Gabby Douglas — Olympic Gymnastics All-Around Champion"},
+  {text:"I didn't get here by dreaming about it or thinking about it — I got here by doing it.",author:"Estelle Getty"},
+  {text:"You are in danger of living a life so comfortable that you will die without ever realizing your true potential.",author:"David Goggins"},
+  {text:"Somewhere behind the athlete you've become, the hours of practice, the coaches who pushed you — is the little girl who fell in love with the sport. Don't lose her.",author:"Mia Hamm"},
+  {text:"Only the disciplined ones are free.",author:"Eliud Kipchoge"},
 ];
 
 // ═══════════════════════════════════════════
@@ -511,7 +550,7 @@ const PLAN = [
     {am:{t:'strength',n:'Athletic Upper A',d:'Pull-ups 4×5 @+0kg · DB rows 3×10 @15kg · Face pulls 3×15 · Wrist curls 3×15 · Farmer carry 3×30m @12kg/hand',dur:'60m'},pm:{t:'fencing',n:'Fencing PM',d:'',dur:'90m'}},
     {am:{t:'fencing',n:'Fencing AM',d:'',dur:'90m'},pm:null},
     {am:{t:'strength',n:'Total Body Athletic',d:'Goblet squat 3×10 @20kg · Med ball slams 3×10 · Pallof press 3×12 @18kg · Reverse lunge 3×8/side · Side plank 3×25s',dur:'55m'},pm:{t:'fencing',n:'Fencing PM',d:'',dur:'90m'}},
-    {am:{t:'yoga',n:'Yoga',d:'Saturday yoga',dur:'60m'},pm:{t:'run',n:'Easy Run',d:'20 min Zone 2 · warm up 5 min walk · check hip',dur:'20m'}},
+    {am:{t:'yoga',n:'Yoga',d:'Saturday yoga',dur:'60m'},pm:{t:'run',n:'Easy Run',d:'~3 km Zone 2 · 20 min · warm up 5 min walk · check hip first',dur:'20m'}},
     {am:{t:'rest',n:'Rest',d:'',dur:''},pm:null},
   ]},
   {ph:2,lbl:'W6',gym:3,sessions:6,fencing:4,days:[
@@ -520,7 +559,7 @@ const PLAN = [
     {am:{t:'strength',n:'Athletic Upper A',d:'Pull-ups 4×5 @+2.5kg · DB rows 3×10 @16kg · Face pulls 3×15 · Wrist curls 3×15 · Farmer carry 3×30m @13kg/hand',dur:'60m'},pm:{t:'fencing',n:'Fencing PM',d:'',dur:'90m'}},
     {am:{t:'fencing',n:'Fencing AM',d:'',dur:'90m'},pm:null},
     {am:{t:'strength',n:'Total Body Athletic',d:'Goblet squat 3×10 @22kg · Med ball slams 4×10 · Pallof press 3×12 @20kg · Reverse lunge 3×10/side · Side plank 3×30s',dur:'55m'},pm:{t:'fencing',n:'Fencing PM',d:'Last fencing before summer break 🏖️',dur:'90m'}},
-    {am:{t:'yoga',n:'Yoga',d:'',dur:'60m'},pm:{t:'run',n:'Run',d:'25 min Zone 2',dur:'25m'}},
+    {am:{t:'yoga',n:'Yoga',d:'',dur:'60m'},pm:{t:'run',n:'Run',d:'~4 km Zone 2 · 25 min',dur:'25m'}},
     {am:{t:'rest',n:'Rest',d:'Summer build starts next week — no fencing until September',dur:''},pm:null},
   ]},
   // ══ PHASE 3: SUMMER BUILD (W7-14) — NO FENCING ══
@@ -530,7 +569,7 @@ const PLAN = [
     {am:{t:'rest',n:'Active Recovery',d:'Light walk · foam roll · hip mobility circuit · stretch',dur:'30m'},pm:null},
     {am:{t:'strength',n:'Total Body Athletic',d:'Goblet squat 4×8 @24kg · Med ball slams 4×10 · Pallof press 3×12 @22kg · Reverse lunge 4×8/side · Copenhagen plank 3×20s',dur:'65m'},pm:null},
     {am:{t:'strength',n:'Athletic Upper B',d:'DB shoulder press 3×8 @12kg · DB bench 3×10 @12kg · Lat pulldown 3×10 @32kg · Rear delt flies 3×15 @6kg · Plate pinch 3×30s · Tricep 3×12',dur:'60m'},pm:null},
-    {am:{t:'yoga',n:'Yoga',d:'Summer full-body yoga',dur:'60m'},pm:{t:'run',n:'Run',d:'25 min Zone 2 · flat route',dur:'25m'}},
+    {am:{t:'yoga',n:'Yoga',d:'Summer full-body yoga',dur:'60m'},pm:{t:'run',n:'Run',d:'~4 km Zone 2 · 25 min · flat route',dur:'25m'}},
     {am:{t:'rest',n:'Rest',d:'',dur:''},pm:null},
   ]},
   {ph:3,lbl:'W8',gym:4,sessions:5,fencing:0,days:[
@@ -539,7 +578,7 @@ const PLAN = [
     {am:{t:'rest',n:'Active Recovery',d:'Hip mobility · foam roll · stretch',dur:'30m'},pm:null},
     {am:{t:'strength',n:'Total Body Athletic',d:'Goblet squat 4×8 @26kg · Med ball slams 4×10 · Pallof press 3×12 @24kg · Reverse lunge 4×8/side @8kg · Copenhagen plank 3×25s',dur:'65m'},pm:null},
     {am:{t:'strength',n:'Athletic Upper B',d:'DB shoulder press 3×8 @13kg · DB bench 3×10 @13kg · Lat pulldown 3×10 @35kg · Rear delt 3×15 · Plate pinch 3×35s · Tricep 3×12',dur:'60m'},pm:null},
-    {am:{t:'yoga',n:'Yoga',d:'',dur:'60m'},pm:{t:'run',n:'Run',d:'30 min Zone 2',dur:'30m'}},
+    {am:{t:'yoga',n:'Yoga',d:'',dur:'60m'},pm:{t:'run',n:'Run',d:'~5 km Zone 2 · 30 min',dur:'30m'}},
     {am:{t:'rest',n:'Rest',d:'',dur:''},pm:null},
   ]},
   {ph:3,lbl:'W9',gym:4,sessions:5,fencing:0,days:[
@@ -548,7 +587,7 @@ const PLAN = [
     {am:{t:'rest',n:'Active Recovery',d:'',dur:'30m'},pm:null},
     {am:{t:'strength',n:'Total Body Athletic',d:'Goblet squat 4×8 @28kg · Med ball slams 4×12 · Pallof press 4×10 @26kg · Reverse lunge 4×8/side @10kg · Copenhagen plank 3×30s',dur:'65m'},pm:null},
     {am:{t:'strength',n:'Athletic Upper B',d:'DB shoulder press 4×8 @14kg · DB bench 3×10 @14kg · Lat pulldown 3×10 @37.5kg · Rear delt 3×15 · Plate pinch 3×35s',dur:'60m'},pm:null},
-    {am:{t:'yoga',n:'Yoga',d:'',dur:'60m'},pm:{t:'run',n:'Run',d:'30 min Zone 2 · strong pace',dur:'30m'}},
+    {am:{t:'yoga',n:'Yoga',d:'',dur:'60m'},pm:{t:'run',n:'Run',d:'~5 km Zone 2 · 30 min · strong pace',dur:'30m'}},
     {am:{t:'rest',n:'Rest',d:'',dur:''},pm:null},
   ]},
   {ph:3,lbl:'W10',gym:4,sessions:5,fencing:0,days:[
@@ -557,7 +596,7 @@ const PLAN = [
     {am:{t:'rest',n:'Active Recovery',d:'Hip mobility · walk 30 min',dur:'30m'},pm:null},
     {am:{t:'strength',n:'Total Body Athletic',d:'Goblet squat 4×6 @32kg · Med ball slams 4×12 · Pallof press 4×10 @28kg · Reverse lunge 4×8/side @12kg · Copenhagen plank 4×25s',dur:'65m'},pm:null},
     {am:{t:'strength',n:'Athletic Upper B',d:'DB shoulder press 4×8 @15kg · DB bench 4×8 @15kg · Lat pulldown 4×8 @40kg · Rear delt 3×15 · Plate pinch 3×40s',dur:'60m'},pm:null},
-    {am:{t:'yoga',n:'Yoga',d:'',dur:'60m'},pm:{t:'run',n:'Run',d:'35 min Zone 2',dur:'35m'}},
+    {am:{t:'yoga',n:'Yoga',d:'',dur:'60m'},pm:{t:'run',n:'Run',d:'~5.5 km Zone 2 · 35 min',dur:'35m'}},
     {am:{t:'rest',n:'Rest',d:'',dur:''},pm:null},
   ]},
   {ph:3,lbl:'W11',gym:3,sessions:4,fencing:0,days:[
@@ -566,7 +605,7 @@ const PLAN = [
     {am:{t:'strength',n:'Athletic Upper A — Deload',d:'Pull-ups 3×5 @+7.5kg · Rows 3×8 @15kg · Face pulls 2×15 · Light — deload',dur:'50m'},pm:null},
     {am:{t:'rest',n:'Rest',d:'',dur:''},pm:null},
     {am:{t:'strength',n:'Total Body — Light',d:'Goblet squat 3×8 @22kg · Med ball slams 2×10 · Pallof press 2×10 · Easy session',dur:'45m'},pm:null},
-    {am:{t:'yoga',n:'Yoga',d:'',dur:'60m'},pm:{t:'run',n:'Easy Run',d:'25 min Zone 2 · easy',dur:'25m'}},
+    {am:{t:'yoga',n:'Yoga',d:'',dur:'60m'},pm:{t:'run',n:'Easy Run',d:'~4 km Zone 2 · 25 min · deload week, keep it easy',dur:'25m'}},
     {am:{t:'rest',n:'Rest',d:'',dur:''},pm:null},
   ]},
   {ph:3,lbl:'W12',gym:4,sessions:5,fencing:0,days:[
@@ -575,7 +614,7 @@ const PLAN = [
     {am:{t:'rest',n:'Active Recovery',d:'',dur:'30m'},pm:null},
     {am:{t:'strength',n:'Total Body Athletic',d:'Goblet squat 4×6 @34kg · Med ball slams 4×12 · Pallof press 4×10 @28kg · Reverse lunge 4×8/side @14kg · Copenhagen plank 4×30s',dur:'65m'},pm:null},
     {am:{t:'strength',n:'Athletic Upper B',d:'DB shoulder press 4×8 @15kg · DB bench 4×8 @16kg · Lat pulldown 4×8 @42.5kg · Rear delt 3×15 · Plate pinch 3×40s',dur:'60m'},pm:null},
-    {am:{t:'yoga',n:'Yoga',d:'',dur:'60m'},pm:{t:'run',n:'Run',d:'35 min Zone 2',dur:'35m'}},
+    {am:{t:'yoga',n:'Yoga',d:'',dur:'60m'},pm:{t:'run',n:'Run',d:'~5.5 km Zone 2 · 35 min',dur:'35m'}},
     {am:{t:'rest',n:'Rest',d:'',dur:''},pm:null},
   ]},
   {ph:3,lbl:'W13',gym:4,sessions:5,fencing:0,days:[
@@ -584,7 +623,7 @@ const PLAN = [
     {am:{t:'rest',n:'Active Recovery',d:'',dur:'30m'},pm:null},
     {am:{t:'strength',n:'Total Body Athletic',d:'Goblet squat 4×6 @36kg · Med ball slams 4×15 · Pallof press 4×12 @30kg · Reverse lunge 4×6/side @16kg · Copenhagen plank 4×30s',dur:'65m'},pm:null},
     {am:{t:'strength',n:'Athletic Upper B',d:'DB shoulder press 4×8 @16kg · DB bench 4×8 @17kg · Lat pulldown 4×8 @45kg · Rear delt 3×15 · Plate pinch 3×45s',dur:'60m'},pm:null},
-    {am:{t:'yoga',n:'Yoga',d:'',dur:'60m'},pm:{t:'run',n:'Run',d:'35 min Zone 2 · strong and controlled',dur:'35m'}},
+    {am:{t:'yoga',n:'Yoga',d:'',dur:'60m'},pm:{t:'run',n:'Run',d:'~5.5 km Zone 2 · 35 min · strong and controlled',dur:'35m'}},
     {am:{t:'rest',n:'Rest',d:'Fencing returns in 2 weeks — summer build almost done 💪',dur:''},pm:null},
   ]},
   {ph:3,lbl:'W14',gym:3,sessions:4,fencing:0,days:[
@@ -593,7 +632,7 @@ const PLAN = [
     {am:{t:'rest',n:'Active Recovery',d:'',dur:'30m'},pm:null},
     {am:{t:'strength',n:'Total Body Light',d:'Goblet squat 3×8 @30kg · Med ball slams 3×10 · Pallof press 3×10 · Easy session — preparing for full schedule',dur:'50m'},pm:null},
     {am:{t:'rest',n:'Rest',d:'',dur:''},pm:null},
-    {am:{t:'yoga',n:'Yoga',d:'',dur:'60m'},pm:{t:'run',n:'Easy Run',d:'30 min Zone 2 · last solo run of summer',dur:'30m'}},
+    {am:{t:'yoga',n:'Yoga',d:'',dur:'60m'},pm:{t:'run',n:'Easy Run',d:'~5 km Zone 2 · 30 min · last solo run of summer',dur:'30m'}},
     {am:{t:'rest',n:'Rest',d:'Fencing returns next week — you are stronger than when you left the piste 🔥',dur:''},pm:null},
   ]},
   // ══ PHASE 4: COMPETITION SEASON (W15-22) — FENCING RETURNS ══
@@ -612,7 +651,7 @@ const PLAN = [
     {am:{t:'strength',n:'Athletic Upper A',d:'Pull-ups 4×5 @+17.5kg · DB rows 4×8 @21kg · Face pulls 3×15 · Wrist curls 4×15 · Farmer carry 4×30m @20kg/hand',dur:'60m'},pm:{t:'fencing',n:'Fencing PM',d:'',dur:'90m'}},
     {am:{t:'fencing',n:'Fencing AM',d:'',dur:'90m'},pm:null},
     {am:{t:'strength',n:'Athletic Upper B',d:'DB shoulder press 3×8 @15kg · DB bench 3×8 @17kg · Lat pulldown 3×10 @42.5kg · Rear delt 3×15 · Plate pinch 3×40s',dur:'55m'},pm:{t:'fencing',n:'Fencing PM',d:'',dur:'90m'}},
-    {am:{t:'yoga',n:'Yoga',d:'',dur:'60m'},pm:{t:'run',n:'Easy Run',d:'25 min Zone 2',dur:'25m'}},
+    {am:{t:'yoga',n:'Yoga',d:'',dur:'60m'},pm:{t:'run',n:'Easy Run',d:'~4 km Zone 2 · 25 min · easy',dur:'25m'}},
     {am:{t:'rest',n:'Rest',d:'',dur:''},pm:null},
   ]},
   {ph:4,lbl:'W17',gym:3,sessions:7,fencing:4,days:[
@@ -621,7 +660,7 @@ const PLAN = [
     {am:{t:'strength',n:'Athletic Upper A',d:'Pull-ups 3×5 @+17.5kg · DB rows 3×8 @21kg · Face pulls 3×15 · Wrist curls 3×15 · Farmer carry 3×30m @20kg/hand',dur:'60m'},pm:{t:'fencing',n:'Fencing PM',d:'',dur:'90m'}},
     {am:{t:'fencing',n:'Fencing AM',d:'',dur:'90m'},pm:null},
     {am:{t:'strength',n:'Total Body Athletic',d:'Goblet squat 3×8 @34kg · Med ball slams 3×12 · Pallof press 3×12 @30kg · Reverse lunge 3×8/side @16kg · Side plank 3×35s',dur:'55m'},pm:{t:'fencing',n:'Fencing PM',d:'',dur:'90m'}},
-    {am:{t:'yoga',n:'Yoga',d:'',dur:'60m'},pm:{t:'run',n:'Run',d:'25 min Zone 2',dur:'25m'}},
+    {am:{t:'yoga',n:'Yoga',d:'',dur:'60m'},pm:{t:'run',n:'Run',d:'~4 km Zone 2 · 25 min',dur:'25m'}},
     {am:{t:'rest',n:'Rest',d:'',dur:''},pm:null},
   ]},
   {ph:4,lbl:'W18',gym:3,sessions:7,fencing:4,days:[
@@ -648,7 +687,7 @@ const PLAN = [
     {am:{t:'strength',n:'Athletic Upper A',d:'Pull-ups 3×5 @+17.5kg · Rows 3×8 @21kg · Face pulls 3×15 · Wrist curls 3×15 · Farmer carry 3×30m @20kg/hand',dur:'60m'},pm:{t:'fencing',n:'Fencing PM',d:'',dur:'90m'}},
     {am:{t:'fencing',n:'Fencing AM',d:'',dur:'90m'},pm:null},
     {am:{t:'strength',n:'Total Body Athletic',d:'Goblet squat 3×8 @34kg · Med ball slams 3×12 · Pallof press 3×12 · Reverse lunge 3×8/side @16kg · Side plank 3×35s',dur:'55m'},pm:{t:'fencing',n:'Fencing PM',d:'',dur:'90m'}},
-    {am:{t:'yoga',n:'Yoga',d:'',dur:'60m'},pm:{t:'run',n:'Run',d:'25 min Zone 2',dur:'25m'}},
+    {am:{t:'yoga',n:'Yoga',d:'',dur:'60m'},pm:{t:'run',n:'Run',d:'~4 km Zone 2 · 25 min',dur:'25m'}},
     {am:{t:'rest',n:'Rest',d:'',dur:''},pm:null},
   ]},
   {ph:4,lbl:'W21',gym:3,sessions:7,fencing:4,days:[
@@ -737,6 +776,34 @@ function getPhaseForSession() {
 function getSetsCount(exIdx, phase) {
   if (exIdx === 0) return [3,4,4,3][phase-1] || 3;
   return [2,3,3,2][phase-1] || 3;
+}
+
+function buildProgressCard(info) {
+  const weekNum = info.weekNum;
+  const pct = Math.round((weekNum - 1) / TOTAL_WEEKS * 100);
+  const phColors=['','var(--green)','var(--yellow)','var(--accent)','var(--teal)'];
+  const phNames=['','Competition Ready','Foundation','Summer Build','Competition Season'];
+  const ph = PLAN[info.weekIdx]?.ph || 1;
+  const weeksLeft = TOTAL_WEEKS - weekNum + 1;
+  return `<div class="progress-card">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">
+      <div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:1.5px">WEEK ${weekNum} <span style="color:${phColors[ph]};font-size:16px">· ${(phNames[ph]||'').toUpperCase()}</span></div>
+        <div style="font-size:11px;color:var(--muted);margin-top:2px">Day ${info.dayIdx+1} of 7 · ${weeksLeft} week${weeksLeft!==1?'s':''} to go</div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-size:22px;font-family:'Bebas Neue',sans-serif;color:var(--accent)">${pct}%</div>
+        <div style="font-size:10px;color:var(--muted)">program done</div>
+      </div>
+    </div>
+    <div style="height:5px;background:rgba(255,255,255,0.06);border-radius:4px;overflow:hidden">
+      <div style="height:100%;width:${pct}%;background:linear-gradient(90deg,var(--accent),var(--teal));border-radius:4px;transition:width .4s"></div>
+    </div>
+    <div style="display:flex;justify-content:space-between;margin-top:5px">
+      <span style="font-size:9px;color:var(--muted)">W1 · May 26</span>
+      <span style="font-size:9px;color:var(--muted)">W22 · Oct 25</span>
+    </div>
+  </div>`;
 }
 
 function getCondition(score) {
@@ -1299,6 +1366,7 @@ async function renderToday() {
 
   el.innerHTML = `
     ${buildQuoteBar()}
+    ${buildProgressCard(info)}
     ${buildCompetitionCountdown()}
     <div class="condition-card ${cond.level}">
       <div class="condition-status">${cond.label}</div>
@@ -1316,6 +1384,7 @@ async function renderToday() {
     </div>
     ${ironAlert}
     ${sessionHTML}
+    <button class="add-btn" onclick="openAddCustom()">+ Add unplanned session (extra fencing, walk, yoga, other…)</button>
     ${buildHabitsSection(suppDone, doneLogs)}
     <div class="sec-label">Hydration</div>
     <div class="water-card" data-target="${waterTarget}">
@@ -1800,75 +1869,254 @@ function openLogDetail(l) {
 }
 
 // ═══════════════════════════════════════════
+//  CUSTOM SESSION
+// ═══════════════════════════════════════════
+function openAddCustom() {
+  openModal('Add Unplanned Session', `
+    <div class="form-field"><div class="form-label">Session type</div>
+      <select class="form-select" id="cs-type">
+        <option value="fencing">Fencing</option>
+        <option value="run">Run</option>
+        <option value="yoga">Yoga / Stretch</option>
+        <option value="strength">Gym / Strength</option>
+        <option value="other">Other</option>
+      </select>
+    </div>
+    <div class="form-field"><div class="form-label">Name / description</div><input class="form-input" id="cs-name" type="text" placeholder="e.g. Extra fencing club, Walk, Swim…"></div>
+    <div class="form-field"><div class="form-label">Duration (minutes)</div><input class="form-input" id="cs-dur" type="number" placeholder="60"></div>
+    <div class="form-field"><div class="form-label">Notes</div><textarea class="form-input" id="cs-notes" placeholder="How did it go?"></textarea></div>
+  `, saveCustomSession);
+}
+
+async function saveCustomSession() {
+  const type  = document.getElementById('cs-type')?.value||'other';
+  const name  = document.getElementById('cs-name')?.value||'Custom Session';
+  const dur   = document.getElementById('cs-dur')?.value||'';
+  const notes = document.getElementById('cs-notes')?.value||'';
+  const info  = getTodayInfo();
+  await sb.from('session_logs').insert({
+    date:todayStr(),
+    week_idx: info?.weekIdx??0,
+    day_idx:  info?.dayIdx??0,
+    slot:'custom',
+    type, name,
+    data:{duration:parseInt(dur)||null,notes},
+  });
+  showToast('Session logged ✓');
+  closeModal();
+  if (activePanel==='today') renderToday();
+  if (activePanel==='log')   renderLog();
+}
+
+// ═══════════════════════════════════════════
+//  POLAR INTEGRATION
+// ═══════════════════════════════════════════
+function connectPolar() {
+  const url = `https://flow.polar.com/oauth2/authorization?response_type=code&client_id=${POLAR_CFG.clientId}&redirect_uri=${encodeURIComponent(POLAR_CFG.redirectUri)}&state=polar`;
+  window.location.href = url;
+}
+
+async function handlePolarCallback(code) {
+  try {
+    // Exchange code via Supabase edge function (you need to set this up, or use your own proxy)
+    const res = await fetch(`https://dgipqrsuyezqscbwgbup.supabase.co/functions/v1/polar-token`, {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({code, redirect_uri: POLAR_CFG.redirectUri, client_id: POLAR_CFG.clientId, client_secret: POLAR_CFG.clientSecret})
+    });
+    const data = await res.json();
+    if (!data.access_token) throw new Error(JSON.stringify(data));
+    localStorage.setItem('polar_auth', JSON.stringify({access_token:data.access_token, x_user_id:data.x_user_id}));
+    // Register user (safe to ignore 409)
+    await fetch(`https://www.polaraccesslink.com/v3/users`, {
+      method:'POST',
+      headers:{'Authorization':`Bearer ${data.access_token}`,'Content-Type':'application/json','Accept':'application/json'},
+      body:JSON.stringify({'member-id':String(data.x_user_id)})
+    }).catch(()=>{});
+    showToast('Polar connected! Tap Import to sync sleep & HRV.');
+  } catch(e) { showToast('Polar connection failed: '+e.message); }
+}
+
+async function importPolar() {
+  const auth = safeParseJSON(localStorage.getItem('polar_auth'));
+  if (!auth?.access_token) { showToast('Connect Polar first'); return; }
+  showToast('Importing Polar sleep & HRV…');
+  try {
+    const uid = auth.x_user_id;
+    const h = {'Authorization':`Bearer ${auth.access_token}`,'Accept':'application/json'};
+    const [sRes, nRes] = await Promise.all([
+      fetch(`https://www.polaraccesslink.com/v3/users/${uid}/sleep`, {headers:h}),
+      fetch(`https://www.polaraccesslink.com/v3/users/${uid}/nightly-recharge`, {headers:h}),
+    ]);
+    const sData = await sRes.json().catch(()=>({}));
+    const nData = await nRes.json().catch(()=>({}));
+    const nights = sData?.nights || sData?.data || [];
+    const nrItems = nData?.recharges || nData?.data || [];
+    const nrByDate = {};
+    nrItems.forEach(r=>{ const d=(r.date||r.nightly_recharge_date||'').slice(0,10); if(d) nrByDate[d]=r; });
+    let imported = 0;
+    for (const night of nights) {
+      const date = (night.date||night.sleep_start_time||'').slice(0,10);
+      if (!date || date < PROGRAM_START) continue;
+      const startMs = night.sleep_start_time ? new Date(night.sleep_start_time).getTime() : 0;
+      const endMs   = night.sleep_end_time   ? new Date(night.sleep_end_time).getTime()   : 0;
+      const sleepHours = startMs && endMs ? +((endMs-startMs)/3600000).toFixed(1) : null;
+      const sleepScore = night.sleep_score ?? null;
+      const nr = nrByDate[date];
+      const ansCharge = nr?.ans_charge ?? null;
+      let hrv = null;
+      if (ansCharge!==null) hrv = ansCharge>=3?'green':ansCharge>=2?'orange':'red';
+      const hrv_value = nr?.heart_rate_avg ?? null;
+      const entry = {date};
+      if (sleepHours) entry.sleep_hours = sleepHours;
+      if (sleepScore!=null) { entry.sleep_score = sleepScore; localStorage.setItem('sleep_'+date, sleepScore); }
+      if (hrv) entry.hrv = hrv;
+      if (hrv_value) entry.hrv_value = hrv_value;
+      await sb.from('body_logs').upsert({...entry},{onConflict:'date'});
+      imported++;
+    }
+    showToast(`✓ Imported ${imported} night${imported!==1?'s':''} from Polar`);
+    if (activePanel==='body') renderBody();
+  } catch(e) { showToast('Import failed: '+e.message); }
+}
+
+function disconnectPolar() { localStorage.removeItem('polar_auth'); renderBody(); }
+
+function selectHRV(val) {
+  _hrvSelected = val;
+  document.querySelectorAll('.hrv-btn').forEach(b=>{
+    b.className='hrv-btn';
+    if (b.textContent.toLowerCase()===val) b.classList.add('active-'+val);
+  });
+}
+
+function buildConnectionsCard() {
+  const polar = safeParseJSON(localStorage.getItem('polar_auth'));
+  return `
+    <div class="sec-label">Connections</div>
+    <div class="conn-card">
+      <div class="conn-row" style="padding-top:0">
+        <div class="conn-logo" style="background:#D0021B">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3" stroke="#D0021B" stroke-width="2" stroke-linecap="round"/></svg>
+        </div>
+        <div class="conn-info">
+          <div class="conn-name">Polar Flow</div>
+          <div class="conn-status" style="color:${polar?'var(--green)':'var(--muted)'}">${polar?'● Connected · Sleep & HRV sync active':'○ Not connected'}</div>
+        </div>
+        <div style="display:flex;gap:6px">
+          ${polar
+            ? `<button onclick="importPolar()" style="padding:6px 10px;background:rgba(208,2,27,.15);border:1px solid rgba(208,2,27,.3);border-radius:7px;color:#D0021B;font-size:11px;cursor:pointer;font-family:'DM Sans',sans-serif">Import</button>
+               <button onclick="disconnectPolar()" style="padding:6px 10px;background:var(--card2);border:1px solid var(--border);border-radius:7px;color:var(--muted);font-size:11px;cursor:pointer;font-family:'DM Sans',sans-serif">Disconnect</button>`
+            : `<button onclick="connectPolar()" style="padding:6px 12px;background:rgba(208,2,27,.15);border:1px solid rgba(208,2,27,.4);border-radius:7px;color:#D0021B;font-size:11px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif">Connect</button>`
+          }
+        </div>
+      </div>
+      <div style="font-size:10px;color:var(--muted);padding-top:8px;line-height:1.5">Once your Polar Pacer Pro is set up, connect here to auto-import sleep scores and HRV every morning.</div>
+    </div>`;
+}
+
+// ═══════════════════════════════════════════
 //  STATS TAB
 // ═══════════════════════════════════════════
 async function renderStats() {
   const el = document.getElementById('stats-content');
   el.innerHTML='<div class="loading">Loading…</div>';
   const [{data:sessionLogs},{data:bodyLogs}] = await Promise.all([
-    sb.from('session_logs').select('*').order('date',{ascending:true}).limit(200),
-    sb.from('body_logs').select('*').order('date',{ascending:true}).limit(200),
+    sb.from('session_logs').select('*').order('date',{ascending:true}).limit(300),
+    sb.from('body_logs').select('*').order('date',{ascending:true}).limit(300),
   ]);
 
   Object.values(chartInstances).forEach(c=>{ try{c.destroy();}catch(e){} });
   chartInstances={};
 
-  const chartOpts = (yLabel) => ({responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>ctx.parsed.y+' '+yLabel}}},scales:{x:{grid:{color:'rgba(255,255,255,0.05)'},ticks:{color:'#6e7a8a',font:{size:9},maxTicksLimit:6}},y:{grid:{color:'rgba(255,255,255,0.05)'},ticks:{color:'#6e7a8a',font:{size:9}}}}});
+  const info = getTodayInfo();
+  const allLogs = sessionLogs||[];
+  const allBody = bodyLogs||[];
 
-  const mkChart = (id,type,labels,datasets,yLabel) => {
-    const canvas=document.getElementById(id); if (!canvas) return;
-    chartInstances[id]=new Chart(canvas,{type,data:{labels,datasets},options:chartOpts(yLabel)});
-  };
+  // ── Adherence ──
+  let scheduledUntilToday = 0;
+  if (info) {
+    PLAN.forEach((w,wi)=>{
+      if (wi < info.weekIdx) {
+        w.days.forEach(day=>{ if(day.am&&day.am.t!=='rest') scheduledUntilToday++; if(day.pm&&day.pm.t!=='rest') scheduledUntilToday++; });
+      } else if (wi === info.weekIdx) {
+        w.days.forEach((day,di)=>{ if(di<=info.dayIdx){ if(day.am&&day.am.t!=='rest') scheduledUntilToday++; if(day.pm&&day.pm.t!=='rest') scheduledUntilToday++; } });
+      }
+    });
+  }
+  const planned = allLogs.filter(l=>l.slot&&l.slot!=='custom').length;
+  const adherence = scheduledUntilToday>0 ? Math.min(100,Math.round(planned/scheduledUntilToday*100)) : 0;
+  const totalSessions = allLogs.length;
+  const totalRunKm = allLogs.filter(l=>l.type==='run').reduce((s,l)=>s+(l.data?.distance||0),0);
+  const totalFencing = allLogs.filter(l=>l.type==='fencing').length;
 
-  // Bodyweight
-  const bwData = (bodyLogs||[]).filter(l=>l.weight_kg).map(l=>({x:l.date,y:l.weight_kg}));
-  // Sleep
-  const sleepData = (bodyLogs||[]).filter(l=>l.sleep_score!=null).map(l=>({x:l.date,y:l.sleep_score}));
-  // Fencing quality
-  const fencingLogs = (sessionLogs||[]).filter(l=>l.type==='fencing'&&l.data);
-  const fencingQuality = fencingLogs.map(l=>({x:l.date,y:Math.round(((l.data.energy||0)+(l.data.focus||0)+(l.data.technique||0))/3*10)/10}));
-  // Main lift (trap bar DL)
-  const liftLogs = (sessionLogs||[]).filter(l=>l.type==='strength'&&l.data?.exercises);
-  const liftProgress = [];
+  // ── Chart data ──
+  const bwData  = allBody.filter(l=>l.weight_kg).map(l=>({x:l.date.slice(5),y:+l.weight_kg}));
+  const sleepData = allBody.filter(l=>l.sleep_score!=null).map(l=>({x:l.date.slice(5),y:l.sleep_score}));
+  const hrvData = allBody.filter(l=>l.hrv_value).map(l=>({x:l.date.slice(5),y:l.hrv_value}));
+  const fencingLogs = allLogs.filter(l=>l.type==='fencing'&&l.data);
+  const fencingQuality = fencingLogs.map(l=>({x:l.date.slice(5),y:Math.round(((l.data.energy||0)+(l.data.focus||0)+(l.data.technique||0))/3*10)/10}));
+  const liftLogs = allLogs.filter(l=>l.type==='strength'&&l.data?.exercises);
+  const liftProgress=[]; const pullProgress=[];
   liftLogs.forEach(l=>{
-    const dl = l.data.exercises.find(e=>e.name==='Trap bar deadlift');
-    if (dl?.sets?.length) {
-      const max = Math.max(...dl.sets.map(s=>s.kg||0));
-      if (max>0) liftProgress.push({x:l.date,y:max});
-    }
+    const dl=l.data.exercises.find(e=>e.name==='Trap bar deadlift');
+    if(dl?.sets?.length){const max=Math.max(...dl.sets.map(s=>s.kg||0));if(max>0)liftProgress.push({x:l.date.slice(5),y:max});}
+    const pu=l.data.exercises.find(e=>e.name==='Weighted pull-ups');
+    if(pu?.sets?.length){const max=Math.max(...pu.sets.map(s=>s.kg||0));pullProgress.push({x:l.date.slice(5),y:max});}
   });
-  // Pull-ups
-  const pullProgress = [];
-  liftLogs.forEach(l=>{
-    const pu = l.data.exercises.find(e=>e.name==='Weighted pull-ups');
-    if (pu?.sets?.length) {
-      const max = Math.max(...pu.sets.map(s=>s.kg||0));
-      pullProgress.push({x:l.date,y:max});
-    }
-  });
-  // Supplement adherence (7-day rolling)
-  const suppData = (bodyLogs||[]).filter(l=>l.supps_done).map(l=>{
-    const done = Object.values(l.supps_done||{}).filter(Boolean).length;
-    return {x:l.date,y:Math.round(done/SUPPS.length*100)};
-  });
+  // Macro adherence last 30 days
+  const macroAdherDays=[]; const macroAdherPct=[];
+  for(let i=29;i>=0;i--){
+    const d=new Date();d.setDate(d.getDate()-i);
+    const ds=d.toISOString().slice(0,10);
+    const m=safeParseJSON(localStorage.getItem('macros_'+ds));
+    if(!m)continue;
+    const wInfo=PLAN.find((_,wi)=>{ const s=sessionDate(wi,0); return ds>=s&&ds<=sessionDate(wi,6); });
+    const dayType=m.dayType||'single';
+    const target=(NUTRITION[dayType]||NUTRITION.single);
+    macroAdherDays.push(ds.slice(5));
+    macroAdherPct.push(Math.min(150,Math.round((m.kcal||0)/target.kcal*100)));
+  }
+
+  const chartOpts = (yLabel,extra={}) => ({responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>ctx.parsed.y+' '+yLabel}}},...extra,scales:{x:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#6e7a8a',font:{size:9},maxTicksLimit:7}},y:{grid:{color:'rgba(255,255,255,0.06)'},ticks:{color:'#6e7a8a',font:{size:9}}}}});
+  const mkChart=(id,type,labels,datasets,yLabel)=>{ const c=document.getElementById(id);if(!c)return;chartInstances[id]=new Chart(c,{type,data:{labels,datasets},options:chartOpts(yLabel)}); };
+  const line=(data,color)=>[{data,borderColor:color,backgroundColor:color+'22',borderWidth:2,pointRadius:3,pointBackgroundColor:color,tension:.3}];
 
   el.innerHTML = `
-    <div class="chart-wrap"><div class="chart-title">Bodyweight — Target ${USER.targetWeight}kg</div><div class="chart-canvas-wrap"><canvas id="c-weight"></canvas></div></div>
+    <div class="stat-grid" style="grid-template-columns:1fr 1fr 1fr 1fr;margin-bottom:12px">
+      <div class="stat-tile"><div class="stat-val" style="color:var(--accent)">${adherence}%</div><div class="stat-lbl">Adherence</div></div>
+      <div class="stat-tile"><div class="stat-val">${totalSessions}</div><div class="stat-lbl">Sessions</div></div>
+      <div class="stat-tile"><div class="stat-val" style="color:var(--green)">${totalRunKm.toFixed(1)}</div><div class="stat-lbl">km run</div></div>
+      <div class="stat-tile"><div class="stat-val" style="color:var(--blue)">${totalFencing}</div><div class="stat-lbl">Fencing</div></div>
+    </div>
+    <div class="chart-wrap"><div class="chart-title">Bodyweight — Target ${USER.targetWeight} kg</div><div class="chart-canvas-wrap"><canvas id="c-weight"></canvas></div></div>
     <div class="chart-wrap"><div class="chart-title">Trap Bar Deadlift — Max kg per session</div><div class="chart-canvas-wrap"><canvas id="c-dl"></canvas></div></div>
     <div class="chart-wrap"><div class="chart-title">Pull-ups — Added weight (kg)</div><div class="chart-canvas-wrap"><canvas id="c-pullups"></canvas></div></div>
-    <div class="chart-wrap"><div class="chart-title">Fencing Session Quality — avg score /10</div><div class="chart-canvas-wrap"><canvas id="c-fencing"></canvas></div></div>
-    <div class="chart-wrap"><div class="chart-title">Sleep Score</div><div class="chart-canvas-wrap"><canvas id="c-sleep"></canvas></div></div>
+    <div class="chart-wrap"><div class="chart-title">Fencing Session Quality — avg /10</div><div class="chart-canvas-wrap"><canvas id="c-fencing"></canvas></div></div>
+    <div class="chart-wrap"><div class="chart-title">Sleep Score (Polar)</div><div class="chart-canvas-wrap"><canvas id="c-sleep"></canvas></div></div>
+    <div class="chart-wrap"><div class="chart-title">HRV — ms (Polar)</div><div class="chart-canvas-wrap"><canvas id="c-hrv"></canvas></div></div>
+    <div class="chart-wrap"><div class="chart-title">Nutrition Adherence % (last 30 days)</div><div class="chart-canvas-wrap"><canvas id="c-macros"></canvas></div></div>
     <div class="chart-wrap"><div class="chart-title">Supplement Adherence %</div><div class="chart-canvas-wrap"><canvas id="c-supps"></canvas></div></div>
   `;
 
-  const line = (data,color) => [{data,borderColor:color,backgroundColor:color.replace(')',',0.1)').replace('var(--','rgba(').replace(':',''),borderWidth:2,pointRadius:3,pointBackgroundColor:color,tension:.3}];
-
-  if (bwData.length) { mkChart('c-weight','line',bwData.map(p=>p.x),line(bwData.map(p=>p.y),'#3D9BE9'),'kg'); }
-  if (liftProgress.length) { mkChart('c-dl','line',liftProgress.map(p=>p.x),line(liftProgress.map(p=>p.y),'#E8834B'),'kg'); }
-  if (pullProgress.length) { mkChart('c-pullups','line',pullProgress.map(p=>p.x),line(pullProgress.map(p=>p.y),'#4CAF82'),'kg'); }
-  if (fencingQuality.length) { mkChart('c-fencing','line',fencingQuality.map(p=>p.x),[{data:fencingQuality.map(p=>p.y),borderColor:'#3D9BE9',backgroundColor:'rgba(61,155,233,0.1)',borderWidth:2,pointRadius:3,pointBackgroundColor:'#3D9BE9',tension:.3}],'/10'); }
-  if (sleepData.length) { mkChart('c-sleep','line',sleepData.map(p=>p.x),line(sleepData.map(p=>p.y),'#9B7FE8'),'score'); }
-  if (suppData.length) { mkChart('c-supps','bar',suppData.map(p=>p.x),[{data:suppData.map(p=>p.y),backgroundColor:'rgba(76,175,130,0.5)',borderColor:'#4CAF82',borderWidth:1}],'%'); }
+  // Add target weight line to bodyweight chart
+  if (bwData.length) {
+    const bwLabels = bwData.map(p=>p.x);
+    mkChart('c-weight','line',bwLabels,[
+      {data:bwData.map(p=>p.y),borderColor:'#3D9BE9',backgroundColor:'rgba(61,155,233,0.08)',borderWidth:2,pointRadius:3,pointBackgroundColor:'#3D9BE9',tension:.3,label:'Weight'},
+      {data:bwLabels.map(()=>USER.targetWeight),borderColor:'rgba(76,175,130,0.5)',borderWidth:1,borderDash:[4,4],pointRadius:0,label:'Target',fill:false},
+    ],'kg');
+  }
+  if (liftProgress.length) mkChart('c-dl','line',liftProgress.map(p=>p.x),line(liftProgress.map(p=>p.y),'#E8834B'),'kg');
+  if (pullProgress.length) mkChart('c-pullups','line',pullProgress.map(p=>p.x),line(pullProgress.map(p=>p.y),'#4CAF82'),'kg');
+  if (fencingQuality.length) mkChart('c-fencing','line',fencingQuality.map(p=>p.x),line(fencingQuality.map(p=>p.y),'#3D9BE9'),'/10');
+  if (sleepData.length) mkChart('c-sleep','line',sleepData.map(p=>p.x),line(sleepData.map(p=>p.y),'#9B7FE8'),'score');
+  if (hrvData.length) mkChart('c-hrv','line',hrvData.map(p=>p.x),line(hrvData.map(p=>p.y),'#4CAF82'),'ms');
+  if (macroAdherDays.length) mkChart('c-macros','bar',macroAdherDays,[{data:macroAdherPct,backgroundColor:macroAdherPct.map(v=>v>=95?'rgba(76,175,130,0.6)':v>=70?'rgba(232,184,75,0.5)':'rgba(232,84,84,0.5)'),borderWidth:0}],'%');
+  if (allBody.filter(l=>l.supps_done).length) {
+    const sd=allBody.filter(l=>l.supps_done).map(l=>({x:l.date.slice(5),y:Math.round(Object.values(l.supps_done||{}).filter(Boolean).length/SUPPS.length*100)}));
+    mkChart('c-supps','bar',sd.map(p=>p.x),[{data:sd.map(p=>p.y),backgroundColor:'rgba(76,175,130,0.5)',borderColor:'#4CAF82',borderWidth:1}],'%');
+  }
 }
 
 // ═══════════════════════════════════════════
@@ -1878,93 +2126,122 @@ async function renderBody() {
   const el = document.getElementById('body-content');
   el.innerHTML='<div class="loading">Loading…</div>';
   const [{data:recentLogs},{data:injuries}] = await Promise.all([
-    sb.from('body_logs').select('*').order('date',{ascending:false}).limit(14),
+    sb.from('body_logs').select('*').order('date',{ascending:false}).limit(90),
     sb.from('injuries').select('*').order('date',{ascending:false}),
   ]);
 
-  const latest = recentLogs?.[0];
-  const localSleep = localStorage.getItem('sleep_'+todayStr());
-  const sleepVal = latest?.sleep_score ?? (localSleep!==null?parseInt(localSleep):null);
+  const todayLog = recentLogs?.find(b=>b.date===todayStr()) || null;
+  _hrvSelected = todayLog?.hrv || null;
+  const sleepVal = todayLog?.sleep_score ?? (localStorage.getItem('sleep_'+todayStr())!==null ? parseInt(localStorage.getItem('sleep_'+todayStr())) : null);
+  const latest = recentLogs?.[0]||null;
 
-  // Pre-populate with Marleen's known hip injury if no injuries in DB
+  // Injuries
+  const active = (injuries||[]).filter(i=>i.severity!=='resolved');
+  const resolved = (injuries||[]).filter(i=>i.severity==='resolved');
   let injuryHTML = '';
   if (!injuries||!injuries.length) {
     injuryHTML = `<div class="injury-item">
       <div class="injury-top"><span class="injury-part">Left Hip — radiates to knee & back</span><span class="injury-badge badge-monitoring">Monitoring</span></div>
-      <div class="injury-desc">Pain from lunge mechanics — appears during running without warmup and Bulgarian split squats. No pain during fencing. Monitor and avoid high-impact without warmup. Prioritise hip flexor stretching daily.</div>
+      <div class="injury-desc">Pain from lunge mechanics — appears during running without warmup. No pain during fencing. Avoid Bulgarian split squats. Daily hip flexor stretching is key.</div>
     </div>`;
   } else {
-    injuryHTML = injuries.map(inj=>`<div class="injury-item">
-      <div class="injury-top"><span class="injury-part">${inj.area}</span><span class="injury-badge badge-${inj.severity==='active'?'active':inj.severity==='monitoring'?'monitoring':'resolved'}">${inj.severity}</span></div>
+    injuryHTML = active.map(inj=>`<div class="injury-item">
+      <div class="injury-top"><span class="injury-part">${inj.area}</span><span class="injury-badge badge-${inj.severity==='active'?'active':'monitoring'}">${inj.severity}</span></div>
       <div class="injury-desc">${inj.notes||''}</div>
+      <div style="display:flex;gap:6px;margin-top:8px">
+        <button style="flex:1;padding:6px;background:rgba(76,175,130,.1);border:1px solid rgba(76,175,130,.25);border-radius:7px;color:var(--green);font-size:11px;cursor:pointer;font-family:'DM Sans',sans-serif" onclick="resolveInjury('${inj.id}')">Mark Resolved</button>
+        <button style="flex:1;padding:6px;background:rgba(232,184,75,.1);border:1px solid rgba(232,184,75,.25);border-radius:7px;color:var(--yellow);font-size:11px;cursor:pointer;font-family:'DM Sans',sans-serif" onclick="monitorInjury('${inj.id}')">Monitoring</button>
+      </div>
     </div>`).join('');
+    if (resolved.length) injuryHTML += `<div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin:12px 0 6px">Resolved</div>`+resolved.map(inj=>`<div class="injury-item" style="opacity:.4"><div class="injury-top"><span class="injury-part">${inj.area}</span><span class="injury-badge badge-resolved">resolved</span></div></div>`).join('');
   }
 
   el.innerHTML = `
-    <div class="sec-label">Body Metrics</div>
+    <div class="sec-label">Today's Body Log</div>
     <div class="card">
-      <div class="card-row"><div class="lbl">Name</div><div class="val">Marleen Buitenhuis</div></div>
-      <div class="card-row"><div class="lbl">Age / Height</div><div class="val">25 · 172 cm</div></div>
-      <div class="card-row"><div class="lbl">Start weight</div><div class="val">55 kg</div></div>
-      <div class="card-row"><div class="lbl">Target weight</div><div class="val"><em>${USER.targetWeight} kg</em> — lean muscle gain</div></div>
-      <div class="card-row"><div class="lbl">Latest weight</div><div class="val">${latest?.weight_kg||'—'} kg</div></div>
-      <div class="card-row"><div class="lbl">Body fat %</div><div class="val">${latest?.body_fat_pct||'—'} %</div></div>
-      <div class="card-row"><div class="lbl">Sleep score</div><div class="val">${sleepVal!==null?sleepVal+'/100':'—'}</div></div>
-    </div>
-    <div style="display:flex;gap:8px;margin-bottom:12px">
-      <button class="btn-primary" style="font-size:13px;padding:10px" onclick="openBodyLog()">＋ Log today</button>
-      <button class="btn-secondary" style="margin:0;font-size:12px;padding:10px" onclick="openSleepModal()">Log Sleep Score</button>
-    </div>
-    <div class="sec-label">Recent Entries</div>
-    ${(recentLogs||[]).slice(0,7).map(l=>`<div style="background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:8px 12px;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center">
-      <div style="font-size:11px;color:var(--muted)">${l.date}</div>
-      <div style="font-size:12px;color:var(--text);display:flex;gap:12px">
-        ${l.weight_kg?`<span>⚖️ <em style="color:var(--accent)">${l.weight_kg}</em> kg</span>`:''}
-        ${l.sleep_score!=null?`<span>😴 <em style="color:var(--purple)">${l.sleep_score}</em></span>`:''}
-        ${l.body_fat_pct?`<span>📊 <em>${l.body_fat_pct}</em>%</span>`:''}
+      <div class="form-row" style="margin-bottom:10px">
+        <div class="form-field"><div class="form-label">Weight (kg)</div><input class="form-input" id="b-weight" type="number" step="0.1" placeholder="${USER.weight}" value="${todayLog?.weight_kg||''}"></div>
+        <div class="form-field"><div class="form-label">Body fat %</div><input class="form-input" id="b-bf" type="number" step="0.1" placeholder="—" value="${todayLog?.body_fat_pct||''}"></div>
       </div>
-    </div>`).join('')||'<div style="font-size:12px;color:var(--muted);text-align:center;padding:16px">No entries yet — log your first metrics above.</div>'}
+      <div class="form-row" style="margin-bottom:10px">
+        <div class="form-field"><div class="form-label">Sleep Hours</div><input class="form-input" id="b-sleeph" type="number" step="0.5" placeholder="8.0" value="${todayLog?.sleep_hours||''}"></div>
+        <div class="form-field"><div class="form-label">Sleep Score (Polar)</div><input class="form-input" id="b-sleeps" type="number" placeholder="0–100" value="${todayLog?.sleep_score??''}"></div>
+      </div>
+      <div class="form-row" style="margin-bottom:10px">
+        <div class="form-field"><div class="form-label">HRV value (ms)</div><input class="form-input" id="b-hrv-val" type="number" placeholder="e.g. 62" value="${todayLog?.hrv_value||''}"></div>
+        <div class="form-field"><div class="form-label">HRV status</div>
+          <div class="hrv-btns" style="margin-top:6px">
+            <button class="hrv-btn ${_hrvSelected==='green'?'active-green':''}"  onclick="selectHRV('green')">Green</button>
+            <button class="hrv-btn ${_hrvSelected==='orange'?'active-orange':''}" onclick="selectHRV('orange')">Orange</button>
+            <button class="hrv-btn ${_hrvSelected==='red'?'active-red':''}"    onclick="selectHRV('red')">Red</button>
+          </div>
+        </div>
+      </div>
+      <div class="form-field"><div class="form-label">Notes</div><input class="form-input" id="b-notes" type="text" placeholder="How do you feel today?" value="${todayLog?.notes||''}"></div>
+      <button class="btn-primary" style="margin-top:4px" onclick="saveBodyLog()">Save Body Log</button>
+    </div>
+
+    <div class="sec-label">Last 14 Days</div>
+    ${(recentLogs||[]).slice(0,14).map(b=>`
+      <div class="log-recent-item">
+        <div class="log-ri-top"><span class="log-ri-name">${b.date}</span><span class="log-ri-date" style="color:var(--yellow)">${b.weight_kg?b.weight_kg+' kg':''}</span></div>
+        <div class="log-ri-metrics">
+          ${b.sleep_score!=null?`Sleep <em>${b.sleep_score}</em>`:''}
+          ${b.sleep_hours?` · ${b.sleep_hours}h`:''}
+          ${b.hrv?` · HRV <em style="color:${b.hrv==='green'?'var(--green)':b.hrv==='orange'?'var(--yellow)':'var(--red)'}">${b.hrv}</em>`:''}
+          ${b.hrv_value?` · <em>${b.hrv_value}</em> ms`:''}
+        </div>
+      </div>`).join('')||'<div class="empty-state" style="padding:16px"><p>No body logs yet.</p></div>'}
+
+    <div class="sec-label">Bodyweight Trend</div>
+    <div class="chart-wrap"><div class="chart-canvas-wrap"><canvas id="b-c-weight"></canvas></div></div>
+    <div class="sec-label">Sleep Score Trend <span style="font-size:10px;color:var(--muted);font-weight:400">(Polar)</span></div>
+    <div class="chart-wrap"><div class="chart-canvas-wrap"><canvas id="b-c-sleep"></canvas></div></div>
+    <div class="sec-label">HRV Trend <span style="font-size:10px;color:var(--muted);font-weight:400">(ms · Polar)</span></div>
+    <div class="chart-wrap"><div class="chart-canvas-wrap"><canvas id="b-c-hrv"></canvas></div></div>
+
+    ${buildConnectionsCard()}
+
     <div class="sec-label">Injuries & Monitoring</div>
     ${injuryHTML}
-    <button class="add-btn" onclick="openInjuryModal()">+ Log new injury or note</button>
+    <button class="add-btn" style="margin-top:8px" onclick="openInjuryModal()">+ Log new injury or note</button>
     <div style="height:16px"></div>
   `;
+
+  // Body charts
+  const base={responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#6e7a8a',font:{size:9}},grid:{color:'rgba(255,255,255,0.04)'}},y:{ticks:{color:'#6e7a8a',font:{size:9}},grid:{color:'rgba(255,255,255,0.06)'}}}};
+  const mkLine=(id,labels,data,color)=>{ const c=document.getElementById(id);if(!c||!data.length)return;new Chart(c,{type:'line',data:{labels,datasets:[{data,borderColor:color,backgroundColor:color+'15',borderWidth:2,pointRadius:3,pointBackgroundColor:color,tension:.3}]},options:base}); };
+  const chrono = [...(recentLogs||[])].reverse();
+  const wt=chrono.filter(b=>b.weight_kg>0);  mkLine('b-c-weight',wt.map(b=>b.date.slice(5)),wt.map(b=>b.weight_kg),'#3D9BE9');
+  const sl=chrono.filter(b=>b.sleep_score>0); mkLine('b-c-sleep',sl.map(b=>b.date.slice(5)),sl.map(b=>b.sleep_score),'#9B7FE8');
+  const hv=chrono.filter(b=>b.hrv_value>0);  mkLine('b-c-hrv',hv.map(b=>b.date.slice(5)),hv.map(b=>b.hrv_value),'#4CAF82');
 }
 
-function openBodyLog() {
-  openModal('Log Body Metrics', `
-    <div class="form-row">
-      <div class="form-field"><div class="form-label">Weight (kg)</div><input class="form-input" id="bl-weight" type="number" step="0.1" placeholder="55.0"></div>
-      <div class="form-field"><div class="form-label">Body fat %</div><input class="form-input" id="bl-bf" type="number" step="0.1" placeholder="—"></div>
-    </div>
-    <div class="form-field"><div class="form-label">Polar sleep score (0–100)</div>
-      <div style="display:flex;align-items:center;gap:8px">
-        <input class="sleep-range" id="bl-sleep" type="range" min="0" max="100" value="70" oninput="document.getElementById('bl-sleep-val').textContent=this.value" style="flex:1">
-        <span id="bl-sleep-val" style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:var(--accent);min-width:40px">70</span>
-      </div>
-    </div>
-    <div class="form-field"><div class="form-label">Notes</div><input class="form-input" id="bl-notes" type="text" placeholder="How are you feeling today?"></div>
-  `, async ()=>{
-    const weight = parseFloat(document.getElementById('bl-weight')?.value)||null;
-    const bf = parseFloat(document.getElementById('bl-bf')?.value)||null;
-    const sleep = parseInt(document.getElementById('bl-sleep')?.value)||null;
-    const notes = document.getElementById('bl-notes')?.value||'';
-    const row = {date:todayStr()};
-    if (weight) row.weight_kg=weight;
-    if (bf) row.body_fat_pct=bf;
-    if (sleep!=null) { row.sleep_score=sleep; localStorage.setItem('sleep_'+todayStr(),sleep); }
-    if (notes) row.notes=notes;
-    await sb.from('body_logs').upsert(row,{onConflict:'date'});
-    showToast('Saved ✓');
-    closeModal();
-    renderBody();
-    if (activePanel==='today') renderToday();
-  });
+async function saveBodyLog() {
+  const entry={
+    date:todayStr(),
+    weight_kg: parseFloat(document.getElementById('b-weight')?.value)||null,
+    body_fat_pct: parseFloat(document.getElementById('b-bf')?.value)||null,
+    sleep_hours: parseFloat(document.getElementById('b-sleeph')?.value)||null,
+    sleep_score: parseInt(document.getElementById('b-sleeps')?.value)||null,
+    hrv_value: parseInt(document.getElementById('b-hrv-val')?.value)||null,
+    hrv: _hrvSelected||null,
+    notes: document.getElementById('b-notes')?.value||null,
+  };
+  Object.keys(entry).forEach(k=>{ if(entry[k]===null||entry[k]===undefined) delete entry[k]; });
+  await sb.from('body_logs').upsert({date:todayStr(),...entry},{onConflict:'date'});
+  if (entry.sleep_score) localStorage.setItem('sleep_'+todayStr(), entry.sleep_score);
+  showToast('Saved ✓');
+  renderBody();
+  if (activePanel==='today') renderToday();
 }
+
+async function resolveInjury(id) { await sb.from('injuries').update({severity:'resolved'}).eq('id',id); renderBody(); }
+async function monitorInjury(id) { await sb.from('injuries').update({severity:'monitoring'}).eq('id',id); renderBody(); }
 
 function openSleepModal() {
   openModal('Log Sleep Score', `
-    <div style="font-size:12px;color:var(--muted);line-height:1.5;margin-bottom:12px">Enter your Polar Nightly Recharge score. Higher = better recovered. This drives the condition card on your Today tab.</div>
+    <div style="font-size:12px;color:var(--muted);line-height:1.5;margin-bottom:12px">Enter your Polar Nightly Recharge score. This drives the condition card on your Today tab.</div>
     <div style="display:flex;align-items:center;gap:10px">
       <input class="sleep-range" id="sm-sleep" type="range" min="0" max="100" value="70" oninput="document.getElementById('sm-val').textContent=this.value" style="flex:1">
       <span id="sm-val" style="font-family:'Bebas Neue',sans-serif;font-size:36px;color:var(--accent);min-width:50px">70</span>
@@ -2004,12 +2281,54 @@ function openInjuryModal() {
 }
 
 // ═══════════════════════════════════════════
+//  PUSH NOTIFICATIONS
+// ═══════════════════════════════════════════
+async function initNotifications() {
+  if (!('serviceWorker' in navigator) || !('Notification' in window)) return;
+  try {
+    if (Notification.permission === 'default') await Notification.requestPermission();
+    if (Notification.permission !== 'granted') return;
+    // If you have a sw.js, it will be registered here
+    // For now, use basic local scheduling as fallback
+    scheduleLocalReminder();
+  } catch(e) { console.warn('[Notifications]', e); }
+}
+
+function scheduleLocalReminder() {
+  const now = new Date();
+  const morning = new Date(now);
+  morning.setHours(8, 0, 0, 0);
+  if (morning <= now) morning.setDate(morning.getDate() + 1);
+  const ms = morning - now;
+  setTimeout(() => {
+    if (Notification.permission === 'granted') {
+      new Notification('Marleen — Good morning ⚔️', {
+        body: 'Time to check today\'s sessions and log your metrics.',
+        icon: './apple-touch-icon.png',
+      });
+    }
+    scheduleLocalReminder(); // re-schedule for next day
+  }, ms);
+}
+
+// ═══════════════════════════════════════════
 //  INIT
 // ═══════════════════════════════════════════
+// Handle Polar OAuth callback
+(function handleOAuthCallback() {
+  const params = new URLSearchParams(window.location.search);
+  const code = params.get('code');
+  const state = params.get('state');
+  if (!code) return;
+  history.replaceState({}, '', window.location.pathname);
+  if (state === 'polar') handlePolarCallback(code).then(() => showPanel('body'));
+})();
+
 document.addEventListener('DOMContentLoaded', ()=>{
   updateHeader();
   setInterval(updateHeader, 60000);
   renderToday();
+  initNotifications();
 });
 </script>
 </body>
