@@ -1,0 +1,2016 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Marleen">
+<meta name="theme-color" content="#0c0d10">
+<title>Marleen · Fencing Performance</title>
+<link rel="icon" type="image/png" href="./icon-192.png">
+<link rel="apple-touch-icon" href="./apple-touch-icon.png">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+:root {
+  --accent:#3D9BE9;--dark:#0c0d10;--card:#14161b;--card2:#1a1d24;
+  --border:rgba(255,255,255,0.07);--text:#e4e8f0;--muted:#6e7a8a;
+  --green:#4CAF82;--blue:#3D9BE9;--yellow:#E8B84B;--purple:#9B7FE8;--teal:#3EC9C1;--red:#E85454;
+  --orange:#E8834B;
+  --nav-h:60px;--hdr-h:52px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden}
+body{background:var(--dark);color:var(--text);font-family:'DM Sans',sans-serif;font-weight:300;font-size:14px;line-height:1.5}
+
+.app-header{position:fixed;top:0;left:0;right:0;height:var(--hdr-h);background:var(--dark);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 16px;z-index:100}
+.app-header h1{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;color:#fff}
+.hdr-date{font-size:11px;color:var(--muted);text-align:right}
+.hdr-week{font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:1px;color:var(--accent);text-align:right}
+
+.panels{position:fixed;top:var(--hdr-h);bottom:var(--nav-h);left:0;right:0;overflow:hidden}
+.panel{display:none;height:100%;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:16px 16px 24px}
+.panel.active{display:block}
+
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;height:var(--nav-h);background:var(--card);border-top:1px solid var(--border);display:flex;align-items:stretch;z-index:100;padding-bottom:env(safe-area-inset-bottom)}
+.nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;background:none;border:none;color:var(--muted);cursor:pointer;transition:color .15s;font-family:'DM Sans',sans-serif}
+.nav-btn.active{color:var(--accent)}
+.nav-btn svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.nav-lbl{font-size:9px;letter-spacing:.8px;text-transform:uppercase;font-weight:500}
+
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:10px}
+.card-row{display:flex;justify-content:space-between;align-items:flex-start;padding:7px 0;border-bottom:1px solid var(--border);font-size:12px;gap:8px}
+.card-row:last-child{border:none;padding-bottom:0}
+.card-row .lbl{color:var(--muted);flex-shrink:0}
+.card-row .val{color:var(--text);text-align:right;line-height:1.4}
+.card-row .val em{color:var(--accent);font-style:normal}
+
+.sec-label{font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin:20px 0 10px}
+.sec-label:first-child{margin-top:0}
+
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.stat-tile{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px}
+.stat-val{font-family:'Bebas Neue',sans-serif;font-size:28px;color:#fff;letter-spacing:1px;line-height:1}
+.stat-lbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-top:3px}
+
+.sblock{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:8px;position:relative;overflow:hidden}
+.sblock::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:10px 10px 0 0}
+.sblock.strength::before{background:var(--orange)}
+.sblock.fencing::before{background:var(--accent)}
+.sblock.run::before{background:var(--green)}
+.sblock.yoga::before{background:var(--purple)}
+.sblock.rest::before{background:var(--muted)}
+.sblock.done{opacity:.5}
+.sblock.done::after{content:'DONE';position:absolute;top:10px;right:10px;font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:1.5px;color:var(--green);border:1px solid var(--green);border-radius:4px;padding:1px 6px}
+.sblock-tag{font-size:9px;text-transform:uppercase;letter-spacing:.8px;font-weight:500;margin-bottom:2px}
+.strength .sblock-tag{color:var(--orange)}.fencing .sblock-tag{color:var(--accent)}.run .sblock-tag{color:var(--green)}.yoga .sblock-tag{color:var(--purple)}.rest .sblock-tag{color:var(--muted)}
+.sblock-name{font-size:13px;font-weight:500;color:#fff;margin-bottom:3px}
+.sblock-detail{font-size:11px;color:var(--muted);line-height:1.4}
+.sblock-dur{font-size:9px;color:var(--muted);margin-top:6px;text-transform:uppercase;letter-spacing:.5px;font-weight:500}
+.sblock-actions{display:flex;gap:8px;margin-top:10px}
+.btn-log{flex:1;padding:8px;background:rgba(61,155,233,.12);border:1px solid rgba(61,155,233,.3);border-radius:8px;color:var(--accent);font-size:11px;font-weight:500;letter-spacing:.5px;text-transform:uppercase;cursor:pointer;font-family:'DM Sans',sans-serif;transition:background .15s}
+.btn-log:active{background:rgba(61,155,233,.22)}
+.btn-done{padding:8px 12px;background:rgba(76,175,130,.1);border:1px solid rgba(76,175,130,.25);border-radius:8px;color:var(--green);font-size:11px;font-weight:500;letter-spacing:.5px;text-transform:uppercase;cursor:pointer;font-family:'DM Sans',sans-serif}
+
+.alert{border-radius:10px;padding:12px 14px;margin-bottom:12px;font-size:12px;line-height:1.6}
+.alert.green{background:rgba(76,175,130,.08);border:1px solid rgba(76,175,130,.25);color:var(--green)}
+.alert.yellow{background:rgba(232,184,75,.08);border:1px solid rgba(232,184,75,.25);color:var(--yellow)}
+.alert.red{background:rgba(232,84,84,.08);border:1px solid rgba(232,84,84,.3);color:var(--red)}
+.alert.blue{background:rgba(61,155,233,.08);border:1px solid rgba(61,155,233,.25);color:var(--accent)}
+.alert-title{font-size:10px;text-transform:uppercase;letter-spacing:1px;font-weight:500;opacity:.7;margin-bottom:3px}
+
+.pbar-wrap{height:4px;background:var(--border);border-radius:4px;margin-top:5px;overflow:hidden}
+.pbar-fill{height:100%;border-radius:4px;transition:width .4s}
+
+.water-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:10px}
+.water-glasses{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0}
+.glass{width:36px;height:44px;background:var(--card2);border:1px solid var(--border);border-radius:4px 4px 8px 8px;cursor:pointer;position:relative;overflow:hidden;transition:border-color .15s}
+.glass.filled{border-color:var(--accent)}
+.glass.filled::after{content:'';position:absolute;bottom:0;left:0;right:0;height:70%;background:rgba(61,155,233,.35)}
+.water-total{font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--accent)}
+
+.supp-item{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);cursor:pointer}
+.supp-item:last-child{border:none}
+.supp-check{width:18px;height:18px;border:1.5px solid var(--border);border-radius:4px;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.supp-item.done .supp-check{background:var(--green);border-color:var(--green)}
+.supp-check-mark{width:10px;height:10px;stroke:#fff;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;display:none}
+.supp-item.done .supp-check-mark{display:block}
+.supp-name{font-size:12px;color:var(--text);flex:1}
+.supp-time{font-size:10px;color:var(--muted)}
+
+.macro-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px}
+.macro-tile{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px;text-align:center}
+.macro-val{font-family:'Bebas Neue',sans-serif;font-size:22px;color:#fff}
+.macro-lbl{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-top:1px}
+.macro-sub{font-size:10px;color:var(--accent)}
+
+.day-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:10px}
+.dhead{text-align:center;font-size:9px;letter-spacing:.8px;text-transform:uppercase;color:var(--muted);padding-bottom:6px;font-weight:500}
+.sblock-sm{background:var(--card);border:1px solid var(--border);border-radius:6px;padding:6px 5px;margin-bottom:4px;position:relative;overflow:hidden;min-height:72px;cursor:pointer}
+.sblock-sm::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;border-radius:6px 6px 0 0}
+.sblock-sm.strength::before{background:var(--orange)}.sblock-sm.fencing::before{background:var(--accent)}.sblock-sm.run::before{background:var(--green)}.sblock-sm.yoga::before{background:var(--purple)}.sblock-sm.rest::before{background:var(--muted)}
+.sblock-sm.rest{opacity:.4;cursor:default}
+.sblock-sm.done-sm{opacity:.45}
+.sblock-sm.done-sm::after{content:'✓';position:absolute;bottom:3px;right:4px;font-size:9px;color:var(--green)}
+.sm-tag{font-size:7px;text-transform:uppercase;letter-spacing:.5px;font-weight:500;color:var(--muted);margin-bottom:1px}
+.sm-name{font-size:9px;font-weight:500;color:#fff;line-height:1.2}
+.sm-dur{font-size:8px;color:var(--muted);margin-top:3px}
+.today-col .sblock-sm{border-color:rgba(61,155,233,.35)}
+.today-col .dhead{color:var(--accent)}
+
+.week-nav{display:flex;gap:4px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+.wbtn{padding:4px 9px;border-radius:100px;font-size:9px;font-weight:500;cursor:pointer;border:1px solid var(--border);background:none;color:var(--muted);transition:all .15s;font-family:'DM Sans',sans-serif}
+.wbtn.active{background:var(--accent);border-color:var(--accent);color:#fff}
+.phase-sep{font-size:8px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin:0 2px}
+.wstats{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:12px}
+.wstat{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:10px 8px}
+.wstat-val{font-family:'Bebas Neue',sans-serif;font-size:20px;color:#fff;letter-spacing:1px;line-height:1}
+.wstat-lbl{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-top:2px}
+.legend{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.legend-item{display:flex;align-items:center;gap:4px;font-size:10px;color:var(--muted)}
+.legend-dot{width:7px;height:7px;border-radius:2px;flex-shrink:0}
+
+.log-recent-item{background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;margin-bottom:6px;cursor:pointer}
+.log-ri-top{display:flex;justify-content:space-between;align-items:center}
+.log-ri-name{font-size:12px;font-weight:500;color:var(--text)}
+.log-ri-date{font-size:10px;color:var(--muted)}
+.log-ri-metrics{font-size:11px;color:var(--muted);margin-top:3px}
+.log-ri-metrics em{color:var(--accent);font-style:normal}
+
+.chart-wrap{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:10px}
+.chart-title{font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:1.5px;color:var(--text);margin-bottom:10px}
+.chart-canvas-wrap{position:relative;height:160px}
+
+.form-field{margin-bottom:12px}
+.form-label{font-size:10px;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);font-weight:500;margin-bottom:5px}
+.form-input{width:100%;background:var(--card2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;font-weight:300;padding:10px 12px;outline:none;-webkit-appearance:none;transition:border-color .15s}
+.form-input:focus{border-color:rgba(61,155,233,.5)}
+.form-input::placeholder{color:var(--muted)}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.form-select{width:100%;background:var(--card2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;padding:10px 12px;outline:none;-webkit-appearance:none;cursor:pointer}
+
+.injury-item{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:8px}
+.injury-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
+.injury-part{font-size:13px;font-weight:500;color:var(--text)}
+.injury-badge{font-size:9px;text-transform:uppercase;letter-spacing:.8px;font-weight:500;padding:2px 7px;border-radius:100px}
+.badge-active{background:rgba(232,84,84,.15);color:var(--red);border:1px solid rgba(232,84,84,.3)}
+.badge-monitoring{background:rgba(232,184,75,.15);color:var(--yellow);border:1px solid rgba(232,184,75,.3)}
+.badge-resolved{background:rgba(76,175,130,.15);color:var(--green);border:1px solid rgba(76,175,130,.3)}
+.injury-desc{font-size:11px;color:var(--muted)}
+
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;display:none;backdrop-filter:blur(2px)}
+.modal-bg.open{display:block}
+.modal{position:fixed;bottom:0;left:0;right:0;background:var(--card);border-radius:18px 18px 0 0;border-top:1px solid var(--border);z-index:201;max-height:85vh;transform:translateY(100%);transition:transform .3s cubic-bezier(.32,.72,0,1);display:flex;flex-direction:column}
+.modal.open{transform:translateY(0)}
+.modal-handle{width:36px;height:4px;background:var(--border);border-radius:4px;margin:10px auto 0;flex-shrink:0}
+.modal-header{padding:12px 16px 10px;border-bottom:1px solid var(--border);flex-shrink:0;display:flex;align-items:center;justify-content:space-between}
+.modal-title{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:1.5px;color:#fff}
+.modal-close{width:28px;height:28px;border-radius:50%;background:var(--card2);border:1px solid var(--border);color:var(--muted);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px}
+.modal-body{overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px 16px;flex:1}
+.modal-footer{padding:12px 16px;padding-bottom:calc(12px + env(safe-area-inset-bottom));border-top:1px solid var(--border);flex-shrink:0}
+.btn-primary{width:100%;padding:14px;background:var(--accent);border:none;border-radius:10px;color:#fff;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:1.5px;cursor:pointer;transition:opacity .15s}
+.btn-primary:active{opacity:.85}
+.btn-secondary{width:100%;padding:12px;background:none;border:1px solid var(--border);border-radius:10px;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer;margin-top:8px}
+
+.set-row{display:grid;grid-template-columns:28px 1fr 1fr auto;gap:6px;align-items:center;margin-bottom:6px}
+.set-num{font-size:11px;color:var(--muted);text-align:center;font-weight:500}
+.set-input{background:var(--card2);border:1px solid var(--border);border-radius:7px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;padding:7px 8px;outline:none;width:100%;-webkit-appearance:none;text-align:center}
+.set-input:focus{border-color:rgba(61,155,233,.5)}
+.btn-add-set{width:100%;padding:8px;background:none;border:1px dashed var(--border);border-radius:7px;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:11px;cursor:pointer;margin-top:4px;margin-bottom:12px}
+.exercise-name-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.exercise-name{font-size:12px;font-weight:500;color:var(--text)}
+.exercise-hint{font-size:10px;color:var(--muted)}
+.sets-header{display:grid;grid-template-columns:28px 1fr 1fr auto;gap:6px;margin-bottom:4px}
+.sets-hdr-lbl{font-size:9px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);text-align:center}
+.divider{height:1px;background:var(--border);margin:12px 0}
+
+.chip{display:inline-flex;align-items:center;gap:4px;background:var(--card2);border:1px solid var(--border);border-radius:100px;padding:4px 10px;font-size:10px;font-weight:500;color:var(--muted)}
+.chip-dot{width:5px;height:5px;border-radius:50%}
+.double-badge{display:inline-block;background:rgba(61,155,233,.12);border:1px solid rgba(61,155,233,.25);border-radius:4px;font-size:8px;color:var(--accent);padding:1px 5px;font-weight:500;letter-spacing:.5px;text-transform:uppercase;margin-bottom:4px}
+.pm-badge{display:inline-block;background:rgba(155,127,232,.12);border:1px solid rgba(155,127,232,.25);border-radius:4px;font-size:8px;color:var(--purple);padding:1px 5px;font-weight:500;letter-spacing:.5px;text-transform:uppercase;margin-bottom:4px}
+
+.condition-card{border-radius:12px;padding:14px;margin-bottom:12px;position:relative;overflow:hidden}
+.condition-card.peak{background:linear-gradient(135deg,rgba(76,175,130,.12) 0%,rgba(12,13,16,.8) 80%);border:1px solid rgba(76,175,130,.3)}
+.condition-card.good{background:linear-gradient(135deg,rgba(232,184,75,.10) 0%,rgba(12,13,16,.8) 80%);border:1px solid rgba(232,184,75,.25)}
+.condition-card.caution{background:linear-gradient(135deg,rgba(232,184,75,.10) 0%,rgba(12,13,16,.8) 80%);border:1px solid rgba(232,184,75,.25)}
+.condition-card.warning{background:linear-gradient(135deg,rgba(232,84,84,.10) 0%,rgba(12,13,16,.8) 80%);border:1px solid rgba(232,84,84,.3)}
+.condition-card.unknown{background:var(--card);border:1px solid var(--border)}
+.condition-status{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;margin-bottom:4px}
+.condition-card.peak .condition-status{color:var(--green)}
+.condition-card.good .condition-status{color:var(--yellow)}
+.condition-card.caution .condition-status{color:var(--yellow)}
+.condition-card.warning .condition-status{color:var(--red)}
+.condition-card.unknown .condition-status{color:var(--muted)}
+.condition-msg{font-size:12px;color:var(--muted);line-height:1.5;margin-bottom:10px}
+.sleep-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;white-space:nowrap}
+.sleep-val{font-family:'Bebas Neue',sans-serif;font-size:24px;color:#fff;min-width:36px}
+.sleep-range{-webkit-appearance:none;width:100%;height:4px;background:var(--card2);border-radius:4px;outline:none;cursor:pointer}
+.sleep-range::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:var(--accent);cursor:pointer}
+.btn-save-sleep{padding:8px 12px;background:var(--accent);border:none;border-radius:8px;color:#fff;font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:1px;cursor:pointer;white-space:nowrap}
+
+.add-btn{display:flex;align-items:center;gap:8px;padding:10px 14px;background:none;border:1px dashed var(--border);border-radius:10px;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:12px;cursor:pointer;width:100%;margin-top:4px}
+.add-btn:active{background:var(--card2)}
+.empty-state{text-align:center;padding:32px 16px;color:var(--muted);font-size:12px;line-height:1.6}
+.empty-state-title{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:1px;color:var(--text);margin-bottom:6px}
+.loading{text-align:center;padding:24px;color:var(--muted);font-size:12px}
+textarea.form-input{resize:vertical;min-height:72px}
+</style>
+</head>
+<body>
+
+<header class="app-header">
+  <svg viewBox="0 0 200 42" width="150" height="32" aria-label="MARLEEN FENCING" style="display:block;overflow:visible">
+    <rect x="0" y="2" width="3" height="38" fill="#3D9BE9" rx="1"/>
+    <text x="9" y="28" fill="white" font-family="'Helvetica Neue',Arial,sans-serif" font-size="26" font-weight="900" letter-spacing="-1">MARLEEN</text>
+    <text x="10" y="40" fill="#3D9BE9" font-family="'Helvetica Neue',Arial,sans-serif" font-size="9" font-weight="700" letter-spacing="4">FENCING</text>
+  </svg>
+  <div>
+    <div class="hdr-date" id="hdr-date">—</div>
+    <div class="hdr-week" id="hdr-week">—</div>
+  </div>
+</header>
+
+<main class="panels">
+  <section id="p-today" class="panel active"><div id="today-content"><div class="loading">Loading…</div></div></section>
+  <section id="p-plan"  class="panel"><div id="plan-content"><div class="loading">Loading…</div></div></section>
+  <section id="p-log"   class="panel"><div id="log-content"><div class="loading">Loading…</div></div></section>
+  <section id="p-stats" class="panel"><div id="stats-content"><div class="loading">Loading…</div></div></section>
+  <section id="p-body"  class="panel"><div id="body-content"><div class="loading">Loading…</div></div></section>
+</main>
+
+<nav class="bottom-nav">
+  <button class="nav-btn active" id="nav-today" onclick="showPanel('today')">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><polyline points="12 6 12 12 15.5 15.5"/></svg>
+    <span class="nav-lbl">Today</span>
+  </button>
+  <button class="nav-btn" id="nav-plan" onclick="showPanel('plan')">
+    <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+    <span class="nav-lbl">Plan</span>
+  </button>
+  <button class="nav-btn" id="nav-log" onclick="showPanel('log')">
+    <svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+    <span class="nav-lbl">Log</span>
+  </button>
+  <button class="nav-btn" id="nav-stats" onclick="showPanel('stats')">
+    <svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+    <span class="nav-lbl">Stats</span>
+  </button>
+  <button class="nav-btn" id="nav-body" onclick="showPanel('body')">
+    <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+    <span class="nav-lbl">Body</span>
+  </button>
+</nav>
+
+<div class="modal-bg" id="modal-bg" onclick="closeModal()"></div>
+<div class="modal" id="main-modal">
+  <div class="modal-handle"></div>
+  <div class="modal-header">
+    <div class="modal-title" id="modal-title">Log Session</div>
+    <div class="modal-close" onclick="closeModal()">✕</div>
+  </div>
+  <div class="modal-body" id="modal-body"></div>
+  <div class="modal-footer" id="modal-footer"><button class="btn-primary" onclick="saveModal()">Save</button></div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════
+//  SUPABASE
+// ═══════════════════════════════════════════
+let sb;
+try {
+  const { createClient } = supabase;
+  sb = createClient(
+    'https://dgipqrsuyezqscbwgbup.supabase.co',
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRnaXBxcnN1eWV6cXNjYndnYnVwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk0NTA3MzYsImV4cCI6MjA5NTAyNjczNn0.fAYbu3yz5SOotJtvRxILGwk5h8iaGWj_a-cCFPa896Q'
+  );
+} catch(e) { console.error('Supabase init failed:', e); }
+
+// ═══════════════════════════════════════════
+//  CONFIG
+// ═══════════════════════════════════════════
+const PROGRAM_START = '2026-05-26';
+const TOTAL_WEEKS   = 22;
+const USER = {
+  name:'Marleen', age:25, weight:55, height:172, targetWeight:59,
+  lifts:{
+    'Trap bar deadlift':{w:40,r:5},'Front squat':{w:30,r:6},
+    'Leg press':{w:60,r:10},'Hip thrust':{w:40,r:8},
+    'Single-leg press':{w:35,r:8},'Nordic hamstring curl':{w:0,r:8},
+    'Weighted pull-ups':{w:0,r:5},'DB rows':{w:14,r:8},
+    'Face pulls':{w:15,r:15},'Wrist curls':{w:8,r:15},
+    'DB shoulder press':{w:10,r:8},'DB bench press':{w:12,r:10},
+    'Lat pulldown':{w:30,r:10},'Rear delt flies':{w:6,r:15},
+    'Tricep pushdown':{w:20,r:12},'Goblet squat':{w:18,r:8},
+    'Reverse lunge':{w:0,r:8},'Jump squats':{w:8,r:8},
+  }
+};
+
+const NUTRITION = {
+  double:{kcal:2800,protein:130,carbs:330,fat:80},
+  single:{kcal:2500,protein:130,carbs:270,fat:75},
+  rest:  {kcal:2100,protein:130,carbs:185,fat:70},
+};
+
+const COMP_DATES_DEFAULT = { nationals:'2026-06-13', europeans:'2026-06-16' };
+
+// ═══════════════════════════════════════════
+//  EXERCISES
+// ═══════════════════════════════════════════
+const EXERCISES = {
+  'Power Lower A':[
+    {name:'Trap bar deadlift',    reps:5,  note:'Hinge at hips · brace core · drive through floor · knees track over toes'},
+    {name:'Box jumps',            reps:5,  note:'Land softly · reset fully each rep · drive from hips · quality over speed'},
+    {name:'Leg press',            reps:10, note:'Feet shoulder-width · full depth · drive through heels · no knees caving'},
+    {name:'Hip thrust',           reps:8,  note:'Full hip extension · squeeze glutes at top · upper back on bench'},
+    {name:'Nordic hamstring curl',reps:8,  note:'Eccentric only if needed · control the descent · essential for sprint + lunge health'},
+    {name:'Calf raises',          reps:15, note:'Full ROM · pause at top · slow eccentric · fencing footwork runs on calves'},
+  ],
+  'Power Lower B':[
+    {name:'Front squat',          reps:6,  note:'Elbows high · chest up · knees track over toes · hip-safe alternative to back squat'},
+    {name:'Jump squats',          reps:8,  note:'Controlled landing · explode from hips · lightweight or bodyweight · fencing explosiveness'},
+    {name:'Single-leg press',     reps:8,  note:'Each leg separately · full depth · control the return · reveals left/right imbalances'},
+    {name:'Hip thrust',           reps:8,  note:'Drive hips to ceiling · glute squeeze at top · protects hip flexor'},
+    {name:'Copenhagen plank',     reps:20, note:'Seconds per side · hip adductor strength is critical for lunge stability and groin health'},
+    {name:'Calf raises',          reps:15, note:'Full ROM · pause at top'},
+  ],
+  'Athletic Upper A':[
+    {name:'Weighted pull-ups',    reps:5,  note:'Dead hang start · chest to bar · controlled descent · shoulder blade activation'},
+    {name:'DB rows',              reps:8,  note:'Single-arm or chest-supported · pull to hip not chest · feel the lat contract'},
+    {name:'Face pulls',           reps:15, note:'Pull to forehead · external rotate at end · slow eccentric · rotator cuff health'},
+    {name:'Wrist curls',          reps:15, note:'Full ROM · feel the forearm load · grip strength = blade precision under fatigue'},
+    {name:'Farmer carry',         reps:30, note:'Meters · walk tall · grip hard · core braced · this is fencing endurance in disguise'},
+    {name:'Dead hang',            reps:20, note:'Seconds · grip and shoulder stability · active scapula at top'},
+  ],
+  'Athletic Upper B':[
+    {name:'DB shoulder press',    reps:8,  note:'Full ROM overhead · overhead stability = blade control · feel the shoulder joint'},
+    {name:'DB bench press',       reps:10, note:'Control descent · drive up · feel the chest working'},
+    {name:'Lat pulldown',         reps:10, note:'Pull to chin · squeeze lats at bottom · elbows down'},
+    {name:'Rear delt flies',      reps:15, note:'Light weight · bend elbows slightly · squeeze at top · posture and shoulder health'},
+    {name:'Plate pinch',          reps:35, note:'Seconds · pinch 2 plates together · grip focused · direct forearm strength for fencing'},
+    {name:'Tricep pushdown',      reps:12, note:'Elbows locked · squeeze at bottom · arm extension power'},
+  ],
+  'Total Body Athletic':[
+    {name:'Goblet squat',         reps:8,  note:'Elbows between knees at bottom · chest up · weight in heels · hip-safe loading'},
+    {name:'Med ball slams',       reps:10, note:'Full extension overhead · slam with intent · hip drive matters · explosive chain'},
+    {name:'Pallof press',         reps:12, note:'Anti-rotation · resist the cable pull · arms fully extended · rotational core for fencing'},
+    {name:'Reverse lunge',        reps:8,  note:'Per side · step back · back knee near floor · drive through front heel · hip-safe'},
+    {name:'Copenhagen plank',     reps:25, note:'Seconds per side · lateral hip stability · groin and adductor health'},
+    {name:'Side plank',           reps:30, note:'Seconds per side · lateral stability for explosive direction changes on the piste'},
+  ],
+};
+
+// ═══════════════════════════════════════════
+//  SUPPLEMENTS
+// ═══════════════════════════════════════════
+const SUPPS = [
+  {name:'Creatine 5g', time:'Morning', key:'creatine',
+   why:'Explosive power for lunges, attacks, and direction changes. Builds up in muscle tissue over 3–4 weeks — consistency is everything. Boosts explosive strength 5–10% and speeds recovery between hard fencing exchanges.'},
+  {name:'Protein shake 30g', time:'Post-workout or with meals', key:'protein',
+   why:'You\'re in a muscle-building phase — your body needs raw material. At your training volume, hitting 130g/day total protein is non-negotiable. Shakes bridge the gap when food isn\'t enough. Daily total matters more than timing.'},
+  {name:'Vitamin C 1000mg', time:'Morning with multivitamin', key:'vitc',
+   why:'Immune support during heavy training. Also essential for collagen synthesis — means faster tendon recovery for the hip. Works synergistically with your multivitamin.'},
+  {name:'Omega-3 3g', time:'Morning with food', key:'omega3',
+   why:'Anti-inflammatory — reduces chronic inflammation from daily fencing and gym. Also supports cognitive function and reaction speed, which matter as much as the physical in fencing. Take with your fattiest meal.'},
+  {name:'Magnesium 400mg', time:'Evening only — never morning', key:'mag',
+   why:'Given your fatigue, you may be depleted from sweating. Activates the parasympathetic system — take at night for muscle relaxation, better deep sleep, fewer cramps. Glycinate form absorbs best.'},
+  {name:'Calcium 500mg', time:'With meals (not with iron-rich food)', key:'calcium',
+   why:'Bone density — critical for female athletes under explosive loading. Important note: calcium blocks iron absorption. If you\'re treating low iron, don\'t take calcium at the same time as iron-rich meals or iron supplements.'},
+  {name:'All-in-One Multivitamin', time:'Morning with food', key:'multi',
+   why:'Covers your micronutrient bases. Pay attention to the iron content. If fatigue and low energy persist after 4 weeks of consistent supplementation, ask your doctor for a full blood panel: iron, ferritin, B12, and vitamin D3.'},
+];
+
+// ═══════════════════════════════════════════
+//  HABITS
+// ═══════════════════════════════════════════
+const HABITS = [
+  {key:'training', label:'Training',    icon:'⚔️', auto:true,  desc:'Complete at least one session today',
+   why:'Every session builds the athletic foundation that wins matches. Consistency over 22 weeks is what separates good from elite.'},
+  {key:'water',    label:'Hydration',   icon:'💧', auto:true,  desc:'Hit your daily water target',
+   why:'Dehydration is likely contributing to your fatigue. Even 1–2% dehydration measurably reduces reaction time, strength, and focus — all things that matter in fencing.'},
+  {key:'supps',    label:'Supplements', icon:'💊', auto:true,  desc:'All active supplements checked',
+   why:'Supplements only work with consistency. Creatine, magnesium, and omega-3 all require daily loading. Skipping days resets the cumulative effect.'},
+  {key:'meds',     label:'Meds',        icon:'💉', auto:false, desc:'Take prescribed medicine',
+   why:'Prescribed treatments work when taken consistently. Don\'t skip — your recovery and energy levels depend on it.'},
+  {key:'stretch',  label:'Stretch',     icon:'🤸', auto:false, desc:'Stretch or yoga session',
+   why:'Hip mobility is non-negotiable with your injury. 10 min of daily mobility work prevents the setbacks that derail entire training blocks. This one habit protects everything else.'},
+  {key:'diary',    label:'Diary',       icon:'✍️', auto:false, desc:'Write in your diary',
+   why:'High-level fencing is as mental as physical. Writing helps you process competition anxiety, track patterns in your performance, and stay accountable.'},
+  {key:'craft',    label:'Craft / Read',icon:'📖', auto:false, desc:'Craft or read for 20 min',
+   why:'Creative and intellectual rest recharges the mind differently than sleep. It builds the mental resilience and focus that separate athletes at the European level.'},
+];
+
+// ═══════════════════════════════════════════
+//  QUOTES
+// ═══════════════════════════════════════════
+const QUOTES = [
+  {text:"Champions aren't made in gyms. Champions are made from something deep inside them — a desire, a dream, a vision.",author:"Muhammad Ali"},
+  {text:"The more difficult the victory, the greater the happiness in winning.",author:"Pelé"},
+  {text:"You have to believe in yourself when no one else does.",author:"Serena Williams"},
+  {text:"A champion is defined not by their wins but by how they can recover when they fall.",author:"Serena Williams"},
+  {text:"Do not pray for an easy life. Pray for the strength to endure a difficult one.",author:"Bruce Lee"},
+  {text:"I fear not the man who has practiced 10,000 kicks once, but the man who has practiced one kick 10,000 times.",author:"Bruce Lee"},
+  {text:"Be water, my friend.",author:"Bruce Lee"},
+  {text:"The blade goes where the mind points it.",author:"Fencing proverb"},
+  {text:"In fencing, technique without speed is academic. Speed without technique is reckless. The master has both.",author:"Anonymous"},
+  {text:"Your limits are further than you think. The pain is the proof you are expanding them.",author:"Anonymous"},
+  {text:"Every morning you have two choices: continue to sleep with your dreams, or wake up and chase them.",author:"Anonymous"},
+  {text:"The body achieves what the mind believes.",author:"Napoleon Hill"},
+  {text:"Discipline is choosing between what you want now and what you want most.",author:"Augusta F. Kantra"},
+  {text:"Strength does not come from winning. Your struggles develop your strengths.",author:"Arnold Schwarzenegger"},
+  {text:"You don't get what you wish for. You get what you work for.",author:"Anonymous"},
+  {text:"If something stands between you and your success, move it. Never be denied.",author:"Dwayne Johnson"},
+  {text:"The secret of getting ahead is getting started.",author:"Mark Twain"},
+  {text:"We are what we repeatedly do. Excellence, then, is not an act but a habit.",author:"Aristotle"},
+  {text:"It always seems impossible until it's done.",author:"Nelson Mandela"},
+  {text:"Our greatest glory is not in never falling, but in rising every time we fall.",author:"Confucius"},
+  {text:"Pain is temporary. Quitting lasts forever.",author:"Lance Armstrong"},
+  {text:"The hard days are the best days because that's when champions are made.",author:"Gabby Douglas"},
+  {text:"I've worked too hard and too long to let anything stand in the way of my goals.",author:"Mia Hamm"},
+  {text:"Somewhere behind the athlete you've become, the hours of practice, the coaches who pushed you — is the little girl who fell in love with the sport. Don't lose her.",author:"Mia Hamm"},
+  {text:"You have to expect things of yourself before you can do them.",author:"Michael Jordan"},
+  {text:"It's not about the size of the dog in the fight, but the size of the fight in the dog.",author:"Mark Twain"},
+  {text:"You miss 100% of the shots you don't take.",author:"Wayne Gretzky"},
+  {text:"Some people want it to happen, some wish it would happen, others make it happen.",author:"Michael Jordan"},
+  {text:"What hurts today makes you stronger tomorrow.",author:"Jay Cutler"},
+  {text:"Suffer the pain of discipline or suffer the pain of regret.",author:"Jim Rohn"},
+  {text:"If you want to be the best, you have to do things that other people aren't willing to do.",author:"Michael Phelps"},
+  {text:"The key is not the will to win. It is the will to prepare to win.",author:"Bobby Knight"},
+  {text:"Hard work beats talent when talent doesn't work hard.",author:"Tim Notke"},
+  {text:"The only way to define your limits is by going beyond them.",author:"Arthur C. Clarke"},
+  {text:"I hated every minute of training, but I said, don't quit. Suffer now and live the rest of your life as a champion.",author:"Muhammad Ali"},
+  {text:"Push yourself because no one else is going to do it for you.",author:"Anonymous"},
+  {text:"If you can't fly, run. If you can't run, walk. If you can't walk, crawl. But whatever you do, keep moving forward.",author:"MLK Jr."},
+  {text:"Knowing is not enough; we must apply. Willing is not enough; we must do.",author:"Goethe"},
+  {text:"In the middle of every difficulty lies opportunity.",author:"Albert Einstein"},
+  {text:"The first and best victory is to conquer self.",author:"Plato"},
+  {text:"Waste no more time arguing about what a good person should be. Be one.",author:"Marcus Aurelius"},
+  {text:"You have power over your mind, not outside events. Realize this, and you will find strength.",author:"Marcus Aurelius"},
+  {text:"The impediment to action advances action. What stands in the way becomes the way.",author:"Marcus Aurelius"},
+  {text:"Once you learn to quit, it becomes a habit.",author:"Vince Lombardi"},
+  {text:"It does not matter how slowly you go, as long as you do not stop.",author:"Confucius"},
+  {text:"If you're going through hell, keep going.",author:"Winston Churchill"},
+  {text:"Success is not final, failure is not fatal: it is the courage to continue that counts.",author:"Winston Churchill"},
+  {text:"You are in danger of living a life so comfortable that you will die without ever realizing your true potential.",author:"David Goggins"},
+  {text:"Talent wins games, but teamwork and intelligence win championships.",author:"Michael Jordan"},
+  {text:"To dare is to lose one's footing momentarily. Not to dare is to lose oneself.",author:"Søren Kierkegaard"},
+];
+
+// ═══════════════════════════════════════════
+//  22-WEEK TRAINING PLAN
+// ═══════════════════════════════════════════
+// Days: 0=Mon, 1=Tue, 2=Wed, 3=Thu, 4=Fri, 5=Sat, 6=Sun
+// PROGRAM_START = '2026-05-26' (Monday)
+// W1 May26-Jun1  | W2 Jun2-8  | W3 Jun9-15 (Nationals Sat Jun13=Day5)
+// W4 Jun16-22 (Europeans Mon Jun16=Day0) | W5 Jun23-29 | W6 Jun30-Jul6
+// W7 Jul7-13 [summer starts, no fencing] | ... | W14 Aug24-30
+// W15 Sep1-7 [fencing returns] | ... | W22 Oct19-25
+const PLAN = [
+  // ══ PHASE 1: COMPETITION READY (W1-3) ══
+  {ph:1,lbl:'W1',gym:1,sessions:3,fencing:1,days:[
+    {am:{t:'rest',n:'Rest',d:'Program starts Thursday — rest and prepare mentally',dur:''},pm:null},
+    {am:{t:'rest',n:'Rest',d:'',dur:''},pm:null},
+    {am:{t:'rest',n:'Rest',d:'',dur:''},pm:null},
+    {am:{t:'strength',n:'Power Lower A — Intro',d:'Hip thrust 3×12 @35kg · Leg press 3×12 @55kg · Box jumps 3×5 BW · Nordic 2×8 · Calf raises 3×15 · Hip prehab: clamshells 2×15/side',dur:'50m'},pm:{t:'fencing',n:'Fencing PM',d:'Normal coach session',dur:'90m'}},
+    {am:{t:'fencing',n:'Fencing AM',d:'Morning fencing session',dur:'90m'},pm:null},
+    {am:{t:'yoga',n:'Yoga',d:'Focus on hip openers — pigeon pose, figure-4, hip flexor stretch',dur:'60m'},pm:null},
+    {am:{t:'rest',n:'Rest',d:'Full rest · foam roll · sleep well',dur:''},pm:null},
+  ]},
+  {ph:1,lbl:'W2',gym:2,sessions:6,fencing:4,days:[
+    {am:{t:'strength',n:'Power Lower A',d:'Trap bar DL 3×8 @40kg · Box jumps 3×5 · Leg press 3×10 @60kg · Hip thrust 3×10 @40kg · Nordic 2×8 · Calf 3×15',dur:'55m'},pm:{t:'fencing',n:'Fencing PM',d:'Coach session',dur:'90m'}},
+    {am:{t:'fencing',n:'Fencing AM',d:'Morning session',dur:'90m'},pm:null},
+    {am:{t:'strength',n:'Athletic Upper A',d:'Pull-ups 3×5 BW · DB rows 3×10 @14kg · Face pulls 3×15 @12kg · Wrist curls 3×15 @8kg · Farmer carry 3×30m @10kg/hand',dur:'55m'},pm:{t:'fencing',n:'Fencing PM',d:'Coach session',dur:'90m'}},
+    {am:{t:'fencing',n:'Fencing AM',d:'Morning session',dur:'90m'},pm:null},
+    {am:{t:'rest',n:'Rest',d:'Light stretch · recovery',dur:''},pm:{t:'fencing',n:'Fencing PM',d:'Friday session (on/off)',dur:'90m'}},
+    {am:{t:'yoga',n:'Yoga',d:'Hip mobility focus · lower back · hamstrings',dur:'60m'},pm:null},
+    {am:{t:'rest',n:'Rest',d:'',dur:''},pm:null},
+  ]},
+  {ph:1,lbl:'W3',gym:2,sessions:5,fencing:3,days:[
+    {am:{t:'strength',n:'Power Lower A — Pre-Competition',d:'Trap bar DL 3×6 @42.5kg · Box jumps 3×5 · Leg press 3×10 @60kg · Hip thrust 3×8 @40kg · Calf 2×15 · LIGHT — nationals this week',dur:'45m'},pm:{t:'fencing',n:'Fencing PM',d:'',dur:'90m'}},
+    {am:{t:'fencing',n:'Fencing AM',d:'',dur:'90m'},pm:null},
+    {am:{t:'strength',n:'Athletic Upper A — Pre-Competition',d:'Pull-ups 3×5 · Rows 3×8 @14kg · Face pulls 3×12 · LIGHT — feel good, no fatigue',dur:'40m'},pm:{t:'fencing',n:'Fencing PM',d:'',dur:'90m'}},
+    {am:{t:'fencing',n:'Fencing AM',d:'Easy session — sharp but not exhausting before nationals',dur:'90m'},pm:null},
+    {am:{t:'rest',n:'Rest',d:'Full rest · foam roll · visualize tomorrow · sleep early',dur:''},pm:null},
+    {am:{t:'fencing',n:'NATIONALS 🏆',d:'National Championship — give everything. Trust your body. Trust your training.',dur:'4h'},pm:null},
+    {am:{t:'rest',n:'Recovery',d:'Active recovery · celebrate · prepare mentally for Europeans in 3 days',dur:''},pm:null},
+  ]},
+  // ══ PHASE 2: FOUNDATION (W4-6) ══
+  {ph:2,lbl:'W4',gym:2,sessions:4,fencing:3,days:[
+    {am:{t:'fencing',n:'EUROPEANS 🥇',d:'European Championship — the most important competition of your season. Everything has been building for this moment. Go.',dur:'4h'},pm:null},
+    {am:{t:'rest',n:'Recovery',d:'Post-competition rest · celebrate · let the body recover',dur:''},pm:null},
+    {am:{t:'strength',n:'Power Lower — Light Return',d:'Leg press 3×10 @55kg · Hip thrust 3×10 @35kg · Calf 2×15 · Light return — no max effort',dur:'35m'},pm:{t:'fencing',n:'Fencing PM',d:'Return to training',dur:'90m'}},
+    {am:{t:'fencing',n:'Fencing AM',d:'Back to normal training',dur:'90m'},pm:null},
+    {am:{t:'strength',n:'Athletic Upper — Light Return',d:'Pull-ups 3×5 · DB rows 3×8 @12kg · Face pulls 3×15 · Easy session',dur:'35m'},pm:{t:'fencing',n:'Fencing PM',d:'',dur:'90m'}},
+    {am:{t:'yoga',n:'Yoga',d:'Post-competition recovery yoga · hip openers · full body stretch',dur:'60m'},pm:null},
+    {am:{t:'rest',n:'Rest',d:'',dur:''},pm:null},
+  ]},
+  {ph:2,lbl:'W5',gym:3,sessions:6,fencing:4,days:[
+    {am:{t:'strength',n:'Power Lower A',d:'Trap bar DL 4×6 @45kg · Box jumps 3×5 · Leg press 3×10 @65kg · Hip thrust 3×10 @45kg · Nordic 3×8 · Calf 3×15',dur:'60m'},pm:{t:'fencing',n:'Fencing PM',d:'',dur:'90m'}},
+    {am:{t:'fencing',n:'Fencing AM',d:'',dur:'90m'},pm:null},
+    {am:{t:'strength',n:'Athletic Upper A',d:'Pull-ups 4×5 @+0kg · DB rows 3×10 @15kg · Face pulls 3×15 · Wrist curls 3×15 · Farmer carry 3×30m @12kg/hand',dur:'60m'},pm:{t:'fencing',n:'Fencing PM',d:'',dur:'90m'}},
+    {am:{t:'fencing',n:'Fencing AM',d:'',dur:'90m'},pm:null},
+    {am:{t:'strength',n:'Total Body Athletic',d:'Goblet squat 3×10 @20kg · Med ball slams 3×10 · Pallof press 3×12 @18kg · Reverse lunge 3×8/side · Side plank 3×25s',dur:'55m'},pm:{t:'fencing',n:'Fencing PM',d:'',dur:'90m'}},
+    {am:{t:'yoga',n:'Yoga',d:'Saturday yoga',dur:'60m'},pm:{t:'run',n:'Easy Run',d:'20 min Zone 2 · warm up 5 min walk · check hip',dur:'20m'}},
+    {am:{t:'rest',n:'Rest',d:'',dur:''},pm:null},
+  ]},
+  {ph:2,lbl:'W6',gym:3,sessions:6,fencing:4,days:[
+    {am:{t:'strength',n:'Power Lower A',d:'Trap bar DL 4×6 @47.5kg · Box jumps 4×4 · Leg press 3×10 @70kg · Hip thrust 3×10 @50kg · Nordic 3×8 · Calf 3×15',dur:'60m'},pm:{t:'fencing',n:'Fencing PM',d:'',dur:'90m'}},
+    {am:{t:'fencing',n:'Fencing AM',d:'',dur:'90m'},pm:null},
+    {am:{t:'strength',n:'Athletic Upper A',d:'Pull-ups 4×5 @+2.5kg · DB rows 3×10 @16kg · Face pulls 3×15 · Wrist curls 3×15 · Farmer carry 3×30m @13kg/hand',dur:'60m'},pm:{t:'fencing',n:'Fencing PM',d:'',dur:'90m'}},
+    {am:{t:'fencing',n:'Fencing AM',d:'',dur:'90m'},pm:null},
+    {am:{t:'strength',n:'Total Body Athletic',d:'Goblet squat 3×10 @22kg · Med ball slams 4×10 · Pallof press 3×12 @20kg · Reverse lunge 3×10/side · Side plank 3×30s',dur:'55m'},pm:{t:'fencing',n:'Fencing PM',d:'Last fencing before summer break 🏖️',dur:'90m'}},
+    {am:{t:'yoga',n:'Yoga',d:'',dur:'60m'},pm:{t:'run',n:'Run',d:'25 min Zone 2',dur:'25m'}},
+    {am:{t:'rest',n:'Rest',d:'Summer build starts next week — no fencing until September',dur:''},pm:null},
+  ]},
+  // ══ PHASE 3: SUMMER BUILD (W7-14) — NO FENCING ══
+  {ph:3,lbl:'W7',gym:4,sessions:5,fencing:0,days:[
+    {am:{t:'strength',n:'Power Lower A',d:'Trap bar DL 4×5 @52.5kg · Box jumps 4×5 · Leg press 3×10 @75kg · Hip thrust 4×8 @55kg · Nordic 3×8 · Calf 4×15',dur:'65m'},pm:null},
+    {am:{t:'strength',n:'Athletic Upper A',d:'Pull-ups 4×5 @+5kg · DB rows 4×8 @16kg · Face pulls 3×15 · Wrist curls 4×15 · Farmer carry 3×30m @14kg/hand · Dead hang 3×20s',dur:'65m'},pm:null},
+    {am:{t:'rest',n:'Active Recovery',d:'Light walk · foam roll · hip mobility circuit · stretch',dur:'30m'},pm:null},
+    {am:{t:'strength',n:'Total Body Athletic',d:'Goblet squat 4×8 @24kg · Med ball slams 4×10 · Pallof press 3×12 @22kg · Reverse lunge 4×8/side · Copenhagen plank 3×20s',dur:'65m'},pm:null},
+    {am:{t:'strength',n:'Athletic Upper B',d:'DB shoulder press 3×8 @12kg · DB bench 3×10 @12kg · Lat pulldown 3×10 @32kg · Rear delt flies 3×15 @6kg · Plate pinch 3×30s · Tricep 3×12',dur:'60m'},pm:null},
+    {am:{t:'yoga',n:'Yoga',d:'Summer full-body yoga',dur:'60m'},pm:{t:'run',n:'Run',d:'25 min Zone 2 · flat route',dur:'25m'}},
+    {am:{t:'rest',n:'Rest',d:'',dur:''},pm:null},
+  ]},
+  {ph:3,lbl:'W8',gym:4,sessions:5,fencing:0,days:[
+    {am:{t:'strength',n:'Power Lower B',d:'Front squat 4×6 @32.5kg · Jump squats 3×8 @8kg · Single-leg press 3×10 @35kg · Hip thrust 4×8 @60kg · Copenhagen plank 3×20s · Calf 4×15',dur:'65m'},pm:null},
+    {am:{t:'strength',n:'Athletic Upper A',d:'Pull-ups 4×5 @+7.5kg · DB rows 4×8 @17kg · Face pulls 3×15 · Wrist curls 4×15 · Farmer carry 3×30m @15kg/hand',dur:'65m'},pm:null},
+    {am:{t:'rest',n:'Active Recovery',d:'Hip mobility · foam roll · stretch',dur:'30m'},pm:null},
+    {am:{t:'strength',n:'Total Body Athletic',d:'Goblet squat 4×8 @26kg · Med ball slams 4×10 · Pallof press 3×12 @24kg · Reverse lunge 4×8/side @8kg · Copenhagen plank 3×25s',dur:'65m'},pm:null},
+    {am:{t:'strength',n:'Athletic Upper B',d:'DB shoulder press 3×8 @13kg · DB bench 3×10 @13kg · Lat pulldown 3×10 @35kg · Rear delt 3×15 · Plate pinch 3×35s · Tricep 3×12',dur:'60m'},pm:null},
+    {am:{t:'yoga',n:'Yoga',d:'',dur:'60m'},pm:{t:'run',n:'Run',d:'30 min Zone 2',dur:'30m'}},
+    {am:{t:'rest',n:'Rest',d:'',dur:''},pm:null},
+  ]},
+  {ph:3,lbl:'W9',gym:4,sessions:5,fencing:0,days:[
+    {am:{t:'strength',n:'Power Lower A',d:'Trap bar DL 4×5 @57.5kg · Box jumps 4×5 · Leg press 4×8 @80kg · Hip thrust 4×8 @65kg · Nordic 3×8 · Calf 4×15',dur:'65m'},pm:null},
+    {am:{t:'strength',n:'Athletic Upper A',d:'Pull-ups 4×5 @+10kg · DB rows 4×8 @18kg · Face pulls 3×15 · Wrist curls 4×15 · Farmer carry 4×30m @16kg/hand',dur:'65m'},pm:null},
+    {am:{t:'rest',n:'Active Recovery',d:'',dur:'30m'},pm:null},
+    {am:{t:'strength',n:'Total Body Athletic',d:'Goblet squat 4×8 @28kg · Med ball slams 4×12 · Pallof press 4×10 @26kg · Reverse lunge 4×8/side @10kg · Copenhagen plank 3×30s',dur:'65m'},pm:null},
+    {am:{t:'strength',n:'Athletic Upper B',d:'DB shoulder press 4×8 @14kg · DB bench 3×10 @14kg · Lat pulldown 3×10 @37.5kg · Rear delt 3×15 · Plate pinch 3×35s',dur:'60m'},pm:null},
+    {am:{t:'yoga',n:'Yoga',d:'',dur:'60m'},pm:{t:'run',n:'Run',d:'30 min Zone 2 · strong pace',dur:'30m'}},
+    {am:{t:'rest',n:'Rest',d:'',dur:''},pm:null},
+  ]},
+  {ph:3,lbl:'W10',gym:4,sessions:5,fencing:0,days:[
+    {am:{t:'strength',n:'Power Lower B',d:'Front squat 4×5 @37.5kg · Jump squats 4×8 @10kg · Single-leg press 4×8 @42.5kg · Hip thrust 4×8 @70kg · Copenhagen plank 3×25s · Calf 4×15',dur:'65m'},pm:null},
+    {am:{t:'strength',n:'Athletic Upper A',d:'Pull-ups 4×5 @+12.5kg · DB rows 4×8 @19kg · Face pulls 3×15 · Wrist curls 4×15 · Farmer carry 4×30m @17kg/hand',dur:'65m'},pm:null},
+    {am:{t:'rest',n:'Active Recovery',d:'Hip mobility · walk 30 min',dur:'30m'},pm:null},
+    {am:{t:'strength',n:'Total Body Athletic',d:'Goblet squat 4×6 @32kg · Med ball slams 4×12 · Pallof press 4×10 @28kg · Reverse lunge 4×8/side @12kg · Copenhagen plank 4×25s',dur:'65m'},pm:null},
+    {am:{t:'strength',n:'Athletic Upper B',d:'DB shoulder press 4×8 @15kg · DB bench 4×8 @15kg · Lat pulldown 4×8 @40kg · Rear delt 3×15 · Plate pinch 3×40s',dur:'60m'},pm:null},
+    {am:{t:'yoga',n:'Yoga',d:'',dur:'60m'},pm:{t:'run',n:'Run',d:'35 min Zone 2',dur:'35m'}},
+    {am:{t:'rest',n:'Rest',d:'',dur:''},pm:null},
+  ]},
+  {ph:3,lbl:'W11',gym:3,sessions:4,fencing:0,days:[
+    {am:{t:'strength',n:'Power Lower A — Deload',d:'Trap bar DL 3×5 @47.5kg · Box jumps 2×5 · Leg press 3×8 @65kg · Hip thrust 3×8 @55kg · Calf 2×15 · Reduce all weights ~20% — deload week',dur:'50m'},pm:null},
+    {am:{t:'rest',n:'Active Recovery',d:'Walk · stretch · hip mobility · no gym',dur:'30m'},pm:null},
+    {am:{t:'strength',n:'Athletic Upper A — Deload',d:'Pull-ups 3×5 @+7.5kg · Rows 3×8 @15kg · Face pulls 2×15 · Light — deload',dur:'50m'},pm:null},
+    {am:{t:'rest',n:'Rest',d:'',dur:''},pm:null},
+    {am:{t:'strength',n:'Total Body — Light',d:'Goblet squat 3×8 @22kg · Med ball slams 2×10 · Pallof press 2×10 · Easy session',dur:'45m'},pm:null},
+    {am:{t:'yoga',n:'Yoga',d:'',dur:'60m'},pm:{t:'run',n:'Easy Run',d:'25 min Zone 2 · easy',dur:'25m'}},
+    {am:{t:'rest',n:'Rest',d:'',dur:''},pm:null},
+  ]},
+  {ph:3,lbl:'W12',gym:4,sessions:5,fencing:0,days:[
+    {am:{t:'strength',n:'Power Lower A',d:'Trap bar DL 4×5 @60kg · Box jumps 4×5 · Leg press 4×8 @85kg · Hip thrust 4×8 @72.5kg · Nordic 3×8 · Calf 4×15',dur:'65m'},pm:null},
+    {am:{t:'strength',n:'Athletic Upper A',d:'Pull-ups 4×5 @+12.5kg · DB rows 4×8 @20kg · Face pulls 3×15 · Wrist curls 4×15 · Farmer carry 4×30m @18kg/hand',dur:'65m'},pm:null},
+    {am:{t:'rest',n:'Active Recovery',d:'',dur:'30m'},pm:null},
+    {am:{t:'strength',n:'Total Body Athletic',d:'Goblet squat 4×6 @34kg · Med ball slams 4×12 · Pallof press 4×10 @28kg · Reverse lunge 4×8/side @14kg · Copenhagen plank 4×30s',dur:'65m'},pm:null},
+    {am:{t:'strength',n:'Athletic Upper B',d:'DB shoulder press 4×8 @15kg · DB bench 4×8 @16kg · Lat pulldown 4×8 @42.5kg · Rear delt 3×15 · Plate pinch 3×40s',dur:'60m'},pm:null},
+    {am:{t:'yoga',n:'Yoga',d:'',dur:'60m'},pm:{t:'run',n:'Run',d:'35 min Zone 2',dur:'35m'}},
+    {am:{t:'rest',n:'Rest',d:'',dur:''},pm:null},
+  ]},
+  {ph:3,lbl:'W13',gym:4,sessions:5,fencing:0,days:[
+    {am:{t:'strength',n:'Power Lower B',d:'Front squat 4×5 @42.5kg · Jump squats 4×8 @12kg · Single-leg press 4×8 @47.5kg · Hip thrust 4×6 @77.5kg · Copenhagen plank 4×25s · Calf 4×15',dur:'65m'},pm:null},
+    {am:{t:'strength',n:'Athletic Upper A',d:'Pull-ups 4×5 @+15kg · DB rows 4×8 @21kg · Face pulls 3×15 · Wrist curls 4×15 · Farmer carry 4×30m @19kg/hand',dur:'65m'},pm:null},
+    {am:{t:'rest',n:'Active Recovery',d:'',dur:'30m'},pm:null},
+    {am:{t:'strength',n:'Total Body Athletic',d:'Goblet squat 4×6 @36kg · Med ball slams 4×15 · Pallof press 4×12 @30kg · Reverse lunge 4×6/side @16kg · Copenhagen plank 4×30s',dur:'65m'},pm:null},
+    {am:{t:'strength',n:'Athletic Upper B',d:'DB shoulder press 4×8 @16kg · DB bench 4×8 @17kg · Lat pulldown 4×8 @45kg · Rear delt 3×15 · Plate pinch 3×45s',dur:'60m'},pm:null},
+    {am:{t:'yoga',n:'Yoga',d:'',dur:'60m'},pm:{t:'run',n:'Run',d:'35 min Zone 2 · strong and controlled',dur:'35m'}},
+    {am:{t:'rest',n:'Rest',d:'Fencing returns in 2 weeks — summer build almost done 💪',dur:''},pm:null},
+  ]},
+  {ph:3,lbl:'W14',gym:3,sessions:4,fencing:0,days:[
+    {am:{t:'strength',n:'Power Lower A — Transition',d:'Trap bar DL 3×5 @55kg · Box jumps 3×5 · Leg press 3×8 @80kg · Hip thrust 3×8 @67.5kg · Calf 3×15 · Reduce volume — fencing returns next week',dur:'55m'},pm:null},
+    {am:{t:'strength',n:'Athletic Upper A — Transition',d:'Pull-ups 3×5 @+12.5kg · Rows 3×8 @19kg · Face pulls 3×15 · Wrist curls 3×15',dur:'55m'},pm:null},
+    {am:{t:'rest',n:'Active Recovery',d:'',dur:'30m'},pm:null},
+    {am:{t:'strength',n:'Total Body Light',d:'Goblet squat 3×8 @30kg · Med ball slams 3×10 · Pallof press 3×10 · Easy session — preparing for full schedule',dur:'50m'},pm:null},
+    {am:{t:'rest',n:'Rest',d:'',dur:''},pm:null},
+    {am:{t:'yoga',n:'Yoga',d:'',dur:'60m'},pm:{t:'run',n:'Easy Run',d:'30 min Zone 2 · last solo run of summer',dur:'30m'}},
+    {am:{t:'rest',n:'Rest',d:'Fencing returns next week — you are stronger than when you left the piste 🔥',dur:''},pm:null},
+  ]},
+  // ══ PHASE 4: COMPETITION SEASON (W15-22) — FENCING RETURNS ══
+  {ph:4,lbl:'W15',gym:3,sessions:7,fencing:4,days:[
+    {am:{t:'strength',n:'Power Lower A',d:'Trap bar DL 4×5 @57.5kg · Box jumps 3×5 · Leg press 3×10 @82.5kg · Hip thrust 4×8 @70kg · Nordic 3×8 · Calf 4×15',dur:'60m'},pm:{t:'fencing',n:'Fencing PM',d:'Fencing returns — welcome back to the piste',dur:'90m'}},
+    {am:{t:'fencing',n:'Fencing AM',d:'First morning session after summer',dur:'90m'},pm:null},
+    {am:{t:'strength',n:'Athletic Upper A',d:'Pull-ups 4×5 @+15kg · DB rows 3×8 @20kg · Face pulls 3×15 · Wrist curls 4×15 · Farmer carry 3×30m @19kg/hand',dur:'60m'},pm:{t:'fencing',n:'Fencing PM',d:'',dur:'90m'}},
+    {am:{t:'fencing',n:'Fencing AM',d:'',dur:'90m'},pm:null},
+    {am:{t:'strength',n:'Total Body Athletic',d:'Goblet squat 3×8 @32kg · Med ball slams 3×12 · Pallof press 3×12 @28kg · Reverse lunge 3×8/side @14kg · Side plank 3×35s',dur:'55m'},pm:{t:'fencing',n:'Fencing PM',d:'',dur:'90m'}},
+    {am:{t:'yoga',n:'Yoga',d:'',dur:'60m'},pm:null},
+    {am:{t:'rest',n:'Rest',d:'',dur:''},pm:null},
+  ]},
+  {ph:4,lbl:'W16',gym:3,sessions:7,fencing:4,days:[
+    {am:{t:'strength',n:'Power Lower A',d:'Trap bar DL 4×5 @60kg · Box jumps 4×5 · Leg press 4×8 @87.5kg · Hip thrust 4×8 @72.5kg · Nordic 3×8 · Calf 4×15',dur:'60m'},pm:{t:'fencing',n:'Fencing PM',d:'',dur:'90m'}},
+    {am:{t:'fencing',n:'Fencing AM',d:'',dur:'90m'},pm:null},
+    {am:{t:'strength',n:'Athletic Upper A',d:'Pull-ups 4×5 @+17.5kg · DB rows 4×8 @21kg · Face pulls 3×15 · Wrist curls 4×15 · Farmer carry 4×30m @20kg/hand',dur:'60m'},pm:{t:'fencing',n:'Fencing PM',d:'',dur:'90m'}},
+    {am:{t:'fencing',n:'Fencing AM',d:'',dur:'90m'},pm:null},
+    {am:{t:'strength',n:'Athletic Upper B',d:'DB shoulder press 3×8 @15kg · DB bench 3×8 @17kg · Lat pulldown 3×10 @42.5kg · Rear delt 3×15 · Plate pinch 3×40s',dur:'55m'},pm:{t:'fencing',n:'Fencing PM',d:'',dur:'90m'}},
+    {am:{t:'yoga',n:'Yoga',d:'',dur:'60m'},pm:{t:'run',n:'Easy Run',d:'25 min Zone 2',dur:'25m'}},
+    {am:{t:'rest',n:'Rest',d:'',dur:''},pm:null},
+  ]},
+  {ph:4,lbl:'W17',gym:3,sessions:7,fencing:4,days:[
+    {am:{t:'strength',n:'Power Lower B',d:'Front squat 3×5 @45kg · Jump squats 3×8 @12kg · Single-leg press 3×8 @50kg · Hip thrust 4×8 @75kg · Copenhagen plank 3×30s · Calf 3×15',dur:'60m'},pm:{t:'fencing',n:'Fencing PM',d:'',dur:'90m'}},
+    {am:{t:'fencing',n:'Fencing AM',d:'',dur:'90m'},pm:null},
+    {am:{t:'strength',n:'Athletic Upper A',d:'Pull-ups 3×5 @+17.5kg · DB rows 3×8 @21kg · Face pulls 3×15 · Wrist curls 3×15 · Farmer carry 3×30m @20kg/hand',dur:'60m'},pm:{t:'fencing',n:'Fencing PM',d:'',dur:'90m'}},
+    {am:{t:'fencing',n:'Fencing AM',d:'',dur:'90m'},pm:null},
+    {am:{t:'strength',n:'Total Body Athletic',d:'Goblet squat 3×8 @34kg · Med ball slams 3×12 · Pallof press 3×12 @30kg · Reverse lunge 3×8/side @16kg · Side plank 3×35s',dur:'55m'},pm:{t:'fencing',n:'Fencing PM',d:'',dur:'90m'}},
+    {am:{t:'yoga',n:'Yoga',d:'',dur:'60m'},pm:{t:'run',n:'Run',d:'25 min Zone 2',dur:'25m'}},
+    {am:{t:'rest',n:'Rest',d:'',dur:''},pm:null},
+  ]},
+  {ph:4,lbl:'W18',gym:3,sessions:7,fencing:4,days:[
+    {am:{t:'strength',n:'Power Lower A',d:'Trap bar DL 3×5 @62.5kg · Box jumps 3×5 · Leg press 3×10 @90kg · Hip thrust 3×8 @77.5kg · Nordic 3×8 · Calf 3×15',dur:'60m'},pm:{t:'fencing',n:'Fencing PM',d:'',dur:'90m'}},
+    {am:{t:'fencing',n:'Fencing AM',d:'',dur:'90m'},pm:null},
+    {am:{t:'strength',n:'Athletic Upper B',d:'DB shoulder press 3×8 @16kg · DB bench 3×8 @18kg · Lat pulldown 3×10 @45kg · Rear delt 3×15 · Plate pinch 3×45s',dur:'55m'},pm:{t:'fencing',n:'Fencing PM',d:'',dur:'90m'}},
+    {am:{t:'fencing',n:'Fencing AM',d:'',dur:'90m'},pm:null},
+    {am:{t:'strength',n:'Athletic Upper A',d:'Pull-ups 3×5 @+17.5kg · Rows 3×8 @21kg · Face pulls 3×15 · Wrist curls 3×15 · Farmer carry 3×30m @20kg/hand',dur:'55m'},pm:{t:'fencing',n:'Fencing PM',d:'',dur:'90m'}},
+    {am:{t:'yoga',n:'Yoga',d:'',dur:'60m'},pm:null},
+    {am:{t:'rest',n:'Rest',d:'',dur:''},pm:null},
+  ]},
+  {ph:4,lbl:'W19',gym:2,sessions:4,fencing:3,days:[
+    {am:{t:'strength',n:'Power Lower A — Deload',d:'Trap bar DL 3×5 @50kg · Box jumps 2×5 · Leg press 2×10 @70kg · Hip thrust 2×8 @60kg · Reduce 20% — deload week',dur:'45m'},pm:{t:'fencing',n:'Fencing PM',d:'',dur:'90m'}},
+    {am:{t:'fencing',n:'Fencing AM',d:'',dur:'90m'},pm:null},
+    {am:{t:'strength',n:'Athletic Upper A — Deload',d:'Pull-ups 2×5 @+12.5kg · Rows 2×8 @17kg · Face pulls 2×15 · Light',dur:'40m'},pm:{t:'fencing',n:'Fencing PM',d:'',dur:'90m'}},
+    {am:{t:'fencing',n:'Fencing AM',d:'',dur:'90m'},pm:null},
+    {am:{t:'rest',n:'Rest',d:'Full rest · stretch · recover',dur:''},pm:null},
+    {am:{t:'yoga',n:'Yoga',d:'',dur:'60m'},pm:null},
+    {am:{t:'rest',n:'Rest',d:'',dur:''},pm:null},
+  ]},
+  {ph:4,lbl:'W20',gym:3,sessions:7,fencing:4,days:[
+    {am:{t:'strength',n:'Power Lower A',d:'Trap bar DL 3×5 @60kg · Box jumps 3×5 · Leg press 3×10 @87.5kg · Hip thrust 3×8 @75kg · Nordic 3×8 · Calf 3×15',dur:'60m'},pm:{t:'fencing',n:'Fencing PM',d:'',dur:'90m'}},
+    {am:{t:'fencing',n:'Fencing AM',d:'',dur:'90m'},pm:null},
+    {am:{t:'strength',n:'Athletic Upper A',d:'Pull-ups 3×5 @+17.5kg · Rows 3×8 @21kg · Face pulls 3×15 · Wrist curls 3×15 · Farmer carry 3×30m @20kg/hand',dur:'60m'},pm:{t:'fencing',n:'Fencing PM',d:'',dur:'90m'}},
+    {am:{t:'fencing',n:'Fencing AM',d:'',dur:'90m'},pm:null},
+    {am:{t:'strength',n:'Total Body Athletic',d:'Goblet squat 3×8 @34kg · Med ball slams 3×12 · Pallof press 3×12 · Reverse lunge 3×8/side @16kg · Side plank 3×35s',dur:'55m'},pm:{t:'fencing',n:'Fencing PM',d:'',dur:'90m'}},
+    {am:{t:'yoga',n:'Yoga',d:'',dur:'60m'},pm:{t:'run',n:'Run',d:'25 min Zone 2',dur:'25m'}},
+    {am:{t:'rest',n:'Rest',d:'',dur:''},pm:null},
+  ]},
+  {ph:4,lbl:'W21',gym:3,sessions:7,fencing:4,days:[
+    {am:{t:'strength',n:'Power Lower B',d:'Front squat 3×5 @45kg · Jump squats 3×8 @12kg · Single-leg press 3×8 @50kg · Hip thrust 3×8 @75kg · Copenhagen plank 3×30s · Calf 3×15',dur:'60m'},pm:{t:'fencing',n:'Fencing PM',d:'',dur:'90m'}},
+    {am:{t:'fencing',n:'Fencing AM',d:'',dur:'90m'},pm:null},
+    {am:{t:'strength',n:'Athletic Upper B',d:'DB shoulder press 3×8 @16kg · DB bench 3×8 @18kg · Lat pulldown 3×10 @45kg · Rear delt 3×15 · Plate pinch 3×45s',dur:'55m'},pm:{t:'fencing',n:'Fencing PM',d:'',dur:'90m'}},
+    {am:{t:'fencing',n:'Fencing AM',d:'',dur:'90m'},pm:null},
+    {am:{t:'strength',n:'Athletic Upper A',d:'Pull-ups 3×5 @+17.5kg · Rows 3×8 @21kg · Face pulls 3×15 · Wrist curls 3×15 · Farmer carry 3×30m @20kg/hand',dur:'55m'},pm:{t:'fencing',n:'Fencing PM',d:'',dur:'90m'}},
+    {am:{t:'yoga',n:'Yoga',d:'',dur:'60m'},pm:null},
+    {am:{t:'rest',n:'Rest',d:'',dur:''},pm:null},
+  ]},
+  {ph:4,lbl:'W22',gym:2,sessions:5,fencing:4,days:[
+    {am:{t:'strength',n:'Power Lower A — Final Week',d:'Trap bar DL 3×5 @60kg · Box jumps 3×5 · Leg press 3×8 @85kg · Hip thrust 3×8 @72.5kg · Calf 3×15 · Last heavy lower session',dur:'55m'},pm:{t:'fencing',n:'Fencing PM',d:'',dur:'90m'}},
+    {am:{t:'fencing',n:'Fencing AM',d:'',dur:'90m'},pm:null},
+    {am:{t:'strength',n:'Athletic Upper A — Final Week',d:'Pull-ups 3×5 @+15kg · Rows 3×8 @19kg · Face pulls 3×15 · Wrist curls 3×15 · Last upper session of the program',dur:'55m'},pm:{t:'fencing',n:'Fencing PM',d:'',dur:'90m'}},
+    {am:{t:'fencing',n:'Fencing AM',d:'',dur:'90m'},pm:null},
+    {am:{t:'rest',n:'Rest',d:'22 weeks of work. You are not the same athlete who started this program.',dur:''},pm:{t:'fencing',n:'Fencing PM',d:'',dur:'90m'}},
+    {am:{t:'yoga',n:'Yoga',d:'End of program yoga · reflect · be proud',dur:'60m'},pm:null},
+    {am:{t:'rest',n:'Program Complete 🏆',d:'22 weeks. Done. What an athlete you have become.',dur:''},pm:null},
+  ]},
+];
+
+// ═══════════════════════════════════════════
+//  UTILITIES
+// ═══════════════════════════════════════════
+const PANELS = ['today','plan','log','stats','body'];
+let activePanel = 'today';
+let modalSaveCallback = null;
+let planWeekIdx = 0;
+let planWeekInitialized = false;
+let _logCtx = null;
+let _extraExCount = 0;
+let chartInstances = {};
+
+function todayStr() { return new Date().toISOString().slice(0,10); }
+function safeParseJSON(s) { try { return s ? JSON.parse(s) : null; } catch(e) { return null; } }
+
+function sessionDate(wIdx, dIdx) {
+  const start = new Date(PROGRAM_START+'T12:00:00');
+  start.setDate(start.getDate() + wIdx*7 + dIdx);
+  return start.toISOString().slice(0,10);
+}
+function isPastSession(wIdx, dIdx) { return sessionDate(wIdx,dIdx) < todayStr(); }
+function isFutureSession(wIdx, dIdx) { return sessionDate(wIdx,dIdx) > todayStr(); }
+
+function getTodayInfo() {
+  const start = new Date(PROGRAM_START+'T00:00:00');
+  const now = new Date(); now.setHours(0,0,0,0); start.setHours(0,0,0,0);
+  const diff = Math.round((now - start) / 86400000);
+  if (diff < 0 || diff >= TOTAL_WEEKS * 7) return null;
+  return { weekIdx:Math.floor(diff/7), dayIdx:diff%7, weekNum:Math.floor(diff/7)+1, dayNum:(diff%7)+1 };
+}
+
+function getDayType(wIdx, dIdx) {
+  const am = resolveSession(wIdx, dIdx, 'am');
+  const pm = resolveSession(wIdx, dIdx, 'pm');
+  const hasAm = am && am.t !== 'rest';
+  const hasPm = pm && pm.t !== 'rest';
+  if (!hasAm && !hasPm) return 'rest';
+  return (hasAm && hasPm) ? 'double' : 'single';
+}
+
+function typeColor(t) {
+  return {strength:'var(--orange)',fencing:'var(--accent)',run:'var(--green)',
+    yoga:'var(--purple)',rest:'var(--muted)'}[t]||'var(--muted)';
+}
+
+function getExercisesForSession(name) {
+  for (const key of Object.keys(EXERCISES)) {
+    if (name.startsWith(key)) return EXERCISES[key];
+  }
+  const n = name.toLowerCase();
+  if (n.includes('lower')) return EXERCISES['Power Lower A'];
+  if (n.includes('upper a')) return EXERCISES['Athletic Upper A'];
+  if (n.includes('upper b')) return EXERCISES['Athletic Upper B'];
+  if (n.includes('upper')) return EXERCISES['Athletic Upper A'];
+  if (n.includes('total') || n.includes('body')) return EXERCISES['Total Body Athletic'];
+  return EXERCISES['Power Lower A'];
+}
+
+function getPhaseForSession() {
+  if (!_logCtx) return 2;
+  return PLAN[_logCtx.wIdx]?.ph || 2;
+}
+
+function getSetsCount(exIdx, phase) {
+  if (exIdx === 0) return [3,4,4,3][phase-1] || 3;
+  return [2,3,3,2][phase-1] || 3;
+}
+
+function getCondition(score) {
+  if (score === null || score === undefined)
+    return { level:'unknown', label:'Log Sleep Score', msg:'Enter your Polar Nightly Recharge score to see today\'s readiness.' };
+  if (score >= 70) return { level:'peak',    label:'Peak Condition',    msg:'Recovery is excellent. Your body is primed. Push hard in today\'s sessions — on the piste and in the gym.' };
+  if (score >= 50) return { level:'good',    label:'Good to Train',     msg:'Solid recovery. Proceed as planned. Stay focused on technique in fencing — good but not perfect state.' };
+  if (score >= 30) return { level:'caution', label:'Reduce Intensity',  msg:'Below optimal. Cut gym intensity 15–20%. In fencing, focus on precision over power today.' };
+  return             { level:'warning', label:'Rest Recommended', msg:'Recovery is insufficient. Light session or full rest. Pushing hard now risks injury and slows adaptation.' };
+}
+
+function updateHeader() {
+  const info = getTodayInfo();
+  const now = new Date();
+  const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  document.getElementById('hdr-date').textContent = days[now.getDay()]+' '+now.getDate()+' '+months[now.getMonth()];
+  document.getElementById('hdr-week').textContent = info ? 'Week '+info.weekNum+' · Day '+info.dayNum : 'Off Program';
+}
+
+// ═══════════════════════════════════════════
+//  NAVIGATION
+// ═══════════════════════════════════════════
+function showPanel(id) {
+  PANELS.forEach(p => {
+    document.getElementById('p-'+p).classList.toggle('active', p===id);
+    document.getElementById('nav-'+p).classList.toggle('active', p===id);
+  });
+  activePanel = id;
+  if (id==='today') renderToday();
+  if (id==='plan')  renderPlan();
+  if (id==='log')   renderLog();
+  if (id==='stats') renderStats();
+  if (id==='body')  renderBody();
+}
+
+function showToast(msg, duration=3000) {
+  let t = document.getElementById('app-toast');
+  if (!t) {
+    t = document.createElement('div');
+    t.id = 'app-toast';
+    t.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#333;color:#fff;padding:10px 18px;border-radius:20px;font-size:13px;z-index:9999;pointer-events:none;transition:opacity .3s;white-space:nowrap;max-width:90vw;text-align:center';
+    document.body.appendChild(t);
+  }
+  t.textContent = msg;
+  t.style.opacity = '1';
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => t.style.opacity = '0', duration);
+}
+
+function openModal(title, bodyHTML, cb) {
+  document.getElementById('modal-title').textContent = title;
+  document.getElementById('modal-body').innerHTML = bodyHTML;
+  modalSaveCallback = cb || null;
+  document.getElementById('modal-bg').classList.add('open');
+  document.getElementById('main-modal').classList.add('open');
+  const footer = document.getElementById('modal-footer');
+  if (footer) footer.style.display = cb ? '' : 'none';
+}
+function closeModal() {
+  document.getElementById('modal-bg').classList.remove('open');
+  document.getElementById('main-modal').classList.remove('open');
+  modalSaveCallback = null;
+  const footer = document.getElementById('modal-footer');
+  if (footer) footer.style.display = '';
+}
+async function saveModal() { if (modalSaveCallback) await modalSaveCallback(); }
+
+// ═══════════════════════════════════════════
+//  SWAP SYSTEM
+// ═══════════════════════════════════════════
+function getSwaps() { return safeParseJSON(localStorage.getItem('session_swaps'))||{}; }
+function saveSwaps(s) { localStorage.setItem('session_swaps', JSON.stringify(s)); }
+function swapKey(wIdx,dIdx,slot) { return `${wIdx}-${dIdx}-${slot}`; }
+
+function resolveSession(wIdx, dIdx, slot) {
+  const swaps = getSwaps();
+  const key = swapKey(wIdx,dIdx,slot);
+  for (const [from, to] of Object.entries(swaps)) {
+    if (to === key) {
+      const [fw,fd,fs] = from.split('-');
+      const orig = PLAN[+fw]?.days[+fd];
+      return orig ? (fs==='pm'?orig.pm:orig.am) : null;
+    }
+  }
+  if (swaps[key]) return null;
+  return slot==='pm' ? PLAN[wIdx]?.days[dIdx]?.pm : PLAN[wIdx]?.days[dIdx]?.am;
+}
+
+function isMovedOut(wIdx, dIdx, slot) { return !!getSwaps()[swapKey(wIdx,dIdx,slot)]; }
+
+function resolveLogContext(wIdx, dIdx, slot) {
+  const swaps = getSwaps();
+  const key = swapKey(wIdx, dIdx, slot);
+  for (const [from, to] of Object.entries(swaps)) {
+    if (to === key) { const p = from.split('-'); return [+p[0],+p[1],p[2]]; }
+  }
+  return [wIdx, dIdx, slot];
+}
+
+function openMoveModal(wIdx, dIdx, slot) {
+  const s = resolveSession(wIdx, dIdx, slot);
+  if (!s) return;
+  const today = getTodayInfo();
+  const todayAbs = today ? today.weekIdx*7 + today.dayIdx : 0;
+  const dayNames = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  let rows = '';
+  PLAN.forEach((week, wi) => {
+    week.days.forEach((day, di) => {
+      const abs = wi*7+di;
+      if (abs < todayAbs) return;
+      if (wi===wIdx && di===dIdx) return;
+      const existingSession = resolveSession(wi, di, slot);
+      const existingName = existingSession ? existingSession.n : '—';
+      rows += `<div onclick="confirmSwap(${wIdx},${dIdx},'${slot}',${wi},${di})" style="padding:10px 8px;border-bottom:1px solid var(--border);cursor:pointer;display:flex;justify-content:space-between;align-items:center">
+        <div>
+          <div style="font-size:13px;color:var(--text);font-weight:500">W${wi+1} ${dayNames[di]} <span style="color:var(--muted);font-weight:300;font-size:11px">${sessionDate(wi,di)}</span></div>
+          <div style="font-size:11px;color:var(--muted);margin-top:2px">${existingName}</div>
+        </div>
+        <span style="color:var(--accent);font-size:18px">→</span>
+      </div>`;
+    });
+  });
+  openModal(`Move · ${s.n}`, `
+    <div style="font-size:12px;color:var(--muted);margin-bottom:10px">Choose where to move this session.</div>
+    <div style="background:var(--card2);border:1px solid var(--border);border-radius:10px;overflow:hidden;max-height:320px;overflow-y:auto">${rows}</div>
+  `, null);
+}
+
+function confirmSwap(fromW, fromD, fromSlot, toW, toD) {
+  const swaps = getSwaps();
+  const fromK = swapKey(fromW,fromD,fromSlot);
+  const toK   = swapKey(toW,toD,fromSlot);
+  for (const k of Object.keys(swaps)) { if (swaps[k]===toK||k===toK) delete swaps[k]; }
+  delete swaps[fromK];
+  let targetOrigFrom = null;
+  for (const [k,v] of Object.entries(swaps)) { if(v===toK){targetOrigFrom=k;break;} }
+  if (targetOrigFrom) delete swaps[targetOrigFrom];
+  const targetNative = PLAN[toW]?.days[toD]?.[fromSlot==='pm'?'pm':'am'];
+  if (targetNative && targetNative.t !== 'rest') swaps[toK] = fromK;
+  swaps[fromK] = toK;
+  saveSwaps(swaps);
+  closeModal();
+  if (activePanel==='today') renderToday();
+  if (activePanel==='plan')  renderPlan();
+}
+
+function undoSwap(wIdx, dIdx, slot) {
+  const swaps = getSwaps();
+  const key = swapKey(wIdx,dIdx,slot);
+  for (const [k,v] of Object.entries(swaps)) {
+    if (v===key) { delete swaps[k]; delete swaps[key]; saveSwaps(swaps); break; }
+  }
+  if (swaps[key]) { delete swaps[key]; saveSwaps(swaps); }
+  if (activePanel==='today') renderToday();
+  if (activePanel==='plan')  renderPlan();
+}
+
+// ═══════════════════════════════════════════
+//  COMPETITION COUNTDOWN
+// ═══════════════════════════════════════════
+function getCompDates() {
+  const stored = safeParseJSON(localStorage.getItem('comp_dates'));
+  return { nationals: stored?.nationals||COMP_DATES_DEFAULT.nationals, europeans: stored?.europeans||COMP_DATES_DEFAULT.europeans };
+}
+
+function openCompDates() {
+  const { nationals, europeans } = getCompDates();
+  openModal('Competition Dates', `
+    <div class="form-field"><div class="form-label">Nationals date</div><input class="form-input" id="cd-nat" type="date" value="${nationals}"></div>
+    <div class="form-field" style="margin-top:10px"><div class="form-label">Europeans / Next target date</div><input class="form-input" id="cd-eur" type="date" value="${europeans}"></div>
+  `, () => {
+    const nat = document.getElementById('cd-nat')?.value||'';
+    const eur = document.getElementById('cd-eur')?.value||'';
+    localStorage.setItem('comp_dates', JSON.stringify({nationals:nat, europeans:eur}));
+    closeModal(); renderToday();
+  });
+}
+
+function buildCompetitionCountdown() {
+  const { nationals, europeans } = getCompDates();
+  const today = new Date(); today.setHours(0,0,0,0);
+
+  function block(label, dateStr, color, icon, last=false) {
+    if (!dateStr) return `<div style="flex:1;text-align:center;padding:10px 6px${last?'':';border-right:1px solid var(--border)'}">
+      <div style="font-size:9px;letter-spacing:1px;color:var(--muted);margin-bottom:4px">${icon} ${label}</div>
+      <div style="font-size:12px;color:var(--muted);font-style:italic">Set date →</div></div>`;
+    const race = new Date(dateStr); race.setHours(0,0,0,0);
+    const days = Math.ceil((race - today) / 86400000);
+    if (days < 0) return `<div style="flex:1;text-align:center;padding:10px 6px${last?'':';border-right:1px solid var(--border)'}">
+      <div style="font-size:9px;letter-spacing:1px;color:var(--muted);margin-bottom:4px">${icon} ${label}</div>
+      <div style="font-size:14px;color:var(--green);font-weight:700">DONE 🏆</div></div>`;
+    const weeks = Math.floor(days/7); const rem = days%7;
+    return `<div style="flex:1;text-align:center;padding:10px 6px${last?'':';border-right:1px solid var(--border)'}">
+      <div style="font-size:9px;letter-spacing:1px;color:var(--muted);margin-bottom:2px">${icon} ${label}</div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:32px;line-height:1;color:${color}">${days}</div>
+      <div style="font-size:9px;color:var(--muted);margin-top:2px">days · ${weeks}w ${rem}d</div>
+      <div style="font-size:9px;color:var(--muted)">${race.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})}</div>
+    </div>`;
+  }
+
+  return `<div style="background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:12px">
+    <div style="display:flex;align-items:stretch">
+      ${block('NATIONALS', nationals, 'var(--accent)', '🤺')}
+      ${block('EUROPEANS ⭐', europeans, 'var(--yellow)', '🥇', true)}
+      <div style="display:flex;align-items:center;padding:0 10px;cursor:pointer" onclick="openCompDates()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6e7a8a" stroke-width="2" stroke-linecap="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+      </div>
+    </div>
+  </div>`;
+}
+
+// ═══════════════════════════════════════════
+//  QUOTE
+// ═══════════════════════════════════════════
+function getTodayQuote() {
+  const dayNum = Math.floor((new Date() - new Date(PROGRAM_START)) / 86400000);
+  return QUOTES[((dayNum % QUOTES.length) + QUOTES.length) % QUOTES.length];
+}
+function buildQuoteBar() {
+  const q = getTodayQuote();
+  return `<div style="background:var(--card);border-left:3px solid var(--accent);border-radius:0 8px 8px 0;padding:10px 14px;margin-bottom:12px">
+    <div style="font-size:12px;color:var(--text);line-height:1.6;font-style:italic">"${q.text}"</div>
+    <div style="font-size:10px;color:var(--accent);margin-top:6px;font-weight:500">— ${q.author}</div>
+  </div>`;
+}
+
+// ═══════════════════════════════════════════
+//  HABITS
+// ═══════════════════════════════════════════
+function getHabitsDone(suppDone, doneLogs) {
+  const today = todayStr();
+  const waterTarget = 8;
+  const waterCount = parseInt(localStorage.getItem('water_'+today)||'0');
+  const pausedSupps = safeParseJSON(localStorage.getItem('supps_paused'))||{};
+  const activeSupps = SUPPS.filter(s=>!pausedSupps[s.key]);
+  const allSupps = activeSupps.length > 0 && activeSupps.every(s=>suppDone[s.key]);
+  const todayInfo = getTodayInfo();
+  const hasTraining = doneLogs?.some(l => l.day_idx===todayInfo?.dayIdx) || false;
+  const manual = safeParseJSON(localStorage.getItem('habits_manual_'+today))||{};
+  return {
+    training: hasTraining,
+    water:    waterCount >= waterTarget,
+    supps:    allSupps,
+    meds:     !!manual.meds,
+    stretch:  !!manual.stretch,
+    diary:    !!manual.diary,
+    craft:    !!manual.craft,
+  };
+}
+
+function toggleHabit(key) {
+  const today = todayStr();
+  const manual = safeParseJSON(localStorage.getItem('habits_manual_'+today))||{};
+  manual[key] = !manual[key];
+  localStorage.setItem('habits_manual_'+today, JSON.stringify(manual));
+  updateHabitsUI();
+}
+
+function getHabitStreak(key) {
+  let streak = 0;
+  const today = new Date(todayStr()+'T12:00:00');
+  for (let i = 0; i < 90; i++) {
+    const d = new Date(today); d.setDate(d.getDate()-i);
+    const ds = d.toISOString().slice(0,10);
+    const manual = safeParseJSON(localStorage.getItem('habits_manual_'+ds))||{};
+    let wasDone = !!manual[key];
+    if (!wasDone && key==='water') wasDone = parseInt(localStorage.getItem('water_'+ds)||'0') >= 8;
+    if (!wasDone && i > 0) break;
+    if (wasDone) streak++;
+  }
+  return streak;
+}
+
+function buildHabitsSection(suppDone, doneLogs) {
+  const done = getHabitsDone(suppDone, doneLogs);
+  const rings = HABITS.map(h => {
+    const isDone = done[h.key];
+    const streak = getHabitStreak(h.key);
+    const clickAttr = h.auto ? '' : `onclick="toggleHabit('${h.key}')"`;
+    const cursor = h.auto ? 'default' : 'pointer';
+    return `<div class="habit-ring-wrap" style="display:flex;flex-direction:column;align-items:center;gap:4px;cursor:${cursor}" ${clickAttr}>
+      <div class="habit-ring" style="width:44px;height:44px;border-radius:50%;border:2.5px solid ${isDone?'var(--green)':'var(--border)'};background:${isDone?'rgba(76,175,130,0.15)':'transparent'};display:flex;align-items:center;justify-content:center;font-size:18px;transition:all .2s">${h.icon}</div>
+      <div class="habit-lbl" style="font-size:8px;color:${isDone?'var(--green)':'var(--muted)'};text-align:center;letter-spacing:.3px;max-width:40px;line-height:1.2">${h.label}</div>
+      <div class="habit-streak" style="font-size:9px;color:var(--accent);font-weight:500;min-height:13px">${streak>0?streak+'d':''}</div>
+    </div>`;
+  }).join('');
+
+  const completedCount = HABITS.filter(h=>done[h.key]).length;
+  return `
+  <div class="sec-label" style="margin-top:16px">Daily Habits <span class="habit-count" style="color:var(--muted);font-weight:400;font-size:10px">${completedCount}/${HABITS.length} today</span></div>
+  <div class="card" id="habits-card">
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:4px 0 8px">
+      ${rings}
+    </div>
+    <div style="border-top:1px solid var(--border);padding-top:10px;margin-top:4px">
+      ${HABITS.filter(h=>!h.auto).map(h=>`
+        <div class="habit-check-row" style="display:flex;align-items:flex-start;gap:10px;padding:6px 0;border-bottom:1px solid var(--border);cursor:pointer" onclick="toggleHabit('${h.key}')">
+          <div class="habit-box" style="width:18px;height:18px;border:1.5px solid ${done[h.key]?'var(--green)':'var(--border)'};border-radius:4px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:${done[h.key]?'var(--green)':'transparent'};margin-top:1px">
+            ${done[h.key]?'<svg viewBox="0 0 12 12" width="10" height="10" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="2,6 5,9 10,3"/></svg>':''}
+          </div>
+          <div style="flex:1">
+            <div style="font-size:12px;color:var(--text)">${h.icon} ${h.label}</div>
+            <div style="font-size:10px;color:var(--muted);margin-top:1px">${h.desc}</div>
+            <div style="font-size:10px;color:var(--muted);margin-top:4px;line-height:1.5;opacity:.8">${h.why}</div>
+          </div>
+          <div class="habit-row-streak" style="font-size:10px;color:var(--accent);font-weight:500;flex-shrink:0">${getHabitStreak(h.key)>0?getHabitStreak(h.key)+'d 🔥':''}</div>
+        </div>`).join('')}
+    </div>
+    ${buildHabitHeatmap()}
+  </div>`;
+}
+
+function buildHabitHeatmap() {
+  const today = todayStr();
+  const days = [];
+  for (let i = 20; i >= 0; i--) {
+    const d = new Date(today+'T12:00:00'); d.setDate(d.getDate()-i);
+    days.push(d.toISOString().slice(0,10));
+  }
+  const dayLabels = days.map((ds,i) => {
+    if (i===20) return '<span style="color:var(--accent)">•</span>';
+    if (i%7===0) return `<span>${ds.slice(8)}</span>`;
+    return '<span></span>';
+  }).join('');
+  const rows = HABITS.map(h => {
+    const cells = days.map(ds => {
+      const manual = safeParseJSON(localStorage.getItem('habits_manual_'+ds))||{};
+      let isDone = !!manual[h.key];
+      if (!isDone && h.key==='water') isDone = parseInt(localStorage.getItem('water_'+ds)||'0') >= 8;
+      const isToday = ds===today;
+      const bg = isDone ? 'var(--green)' : isToday ? 'rgba(255,255,255,0.06)' : 'rgba(255,255,255,0.04)';
+      const border = isToday ? '1px solid var(--accent)' : '1px solid transparent';
+      return `<div style="width:100%;aspect-ratio:1;border-radius:3px;background:${bg};border:${border}"></div>`;
+    }).join('');
+    return `<div style="display:contents"><div style="font-size:16px;line-height:1;display:flex;align-items:center">${h.icon}</div>${cells}</div>`;
+  }).join('');
+  return `<div style="border-top:1px solid var(--border);padding-top:12px;margin-top:4px">
+    <div style="font-size:10px;color:var(--muted);margin-bottom:8px;letter-spacing:.5px">21-DAY HEATMAP</div>
+    <div style="display:grid;grid-template-columns:20px repeat(21,1fr);gap:3px;align-items:center">
+      <div></div>${dayLabels}${rows}
+    </div>
+  </div>`;
+}
+
+function updateHabitsUI() {
+  const card = document.getElementById('habits-card');
+  if (!card) return;
+  const suppDone = safeParseJSON(localStorage.getItem('supps_'+todayStr()))||{};
+  const done = getHabitsDone(suppDone, null);
+  const ringDivs = card.querySelectorAll('.habit-ring-wrap');
+  HABITS.forEach((h,i) => {
+    const wrap = ringDivs[i]; if (!wrap) return;
+    const isDone = done[h.key]; const streak = getHabitStreak(h.key);
+    const ring = wrap.querySelector('.habit-ring');
+    const lbl  = wrap.querySelector('.habit-lbl');
+    const streakEl = wrap.querySelector('.habit-streak');
+    if (ring) { ring.style.borderColor = isDone?'var(--green)':'var(--border)'; ring.style.background = isDone?'rgba(76,175,130,0.15)':'transparent'; }
+    if (lbl)  { lbl.style.color = isDone?'var(--green)':'var(--muted)'; }
+    if (streakEl) streakEl.textContent = streak>0?streak+'d':'';
+  });
+  const rows = card.querySelectorAll('.habit-check-row');
+  HABITS.filter(h=>!h.auto).forEach((h,i) => {
+    const row = rows[i]; if (!row) return;
+    const isDone = done[h.key]; const streak = getHabitStreak(h.key);
+    const box = row.querySelector('.habit-box');
+    const streakEl = row.querySelector('.habit-row-streak');
+    if (box) { box.style.borderColor = isDone?'var(--green)':'var(--border)'; box.style.background = isDone?'var(--green)':'transparent'; box.innerHTML = isDone?'<svg viewBox="0 0 12 12" width="10" height="10" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="2,6 5,9 10,3"/></svg>':''; }
+    if (streakEl) streakEl.textContent = streak>0?streak+'d 🔥':'';
+  });
+  const countEl = card.previousElementSibling?.querySelector?.('.habit-count');
+  if (countEl) countEl.textContent = `${HABITS.filter(h=>done[h.key]).length}/${HABITS.length} today`;
+}
+
+// ═══════════════════════════════════════════
+//  WATER & SUPPLEMENTS
+// ═══════════════════════════════════════════
+function logWater(count) {
+  localStorage.setItem('water_'+todayStr(), count);
+  const card = document.querySelector('.water-card');
+  if (!card) return;
+  const target = parseInt(card.dataset.target||8);
+  const totalEl = card.querySelector('.water-total');
+  if (totalEl) totalEl.textContent = (count*250)+' ml';
+  card.querySelectorAll('.glass').forEach((g,i) => {
+    g.classList.toggle('filled', i<count);
+    g.onclick = ()=>logWater(i<count?i:i+1);
+  });
+  const pbar = card.querySelector('.water-pbar');
+  if (pbar) pbar.style.width = Math.min(100,count/target*100)+'%';
+  sb.from('body_logs').upsert({date:todayStr(),water_glasses:count},{onConflict:'date'}).then(()=>{});
+}
+
+function getSuppPaused(key) { return !!(safeParseJSON(localStorage.getItem('supps_paused'))||{})[key]; }
+function toggleSuppPause(key) {
+  const paused = safeParseJSON(localStorage.getItem('supps_paused'))||{};
+  paused[key] = !paused[key];
+  localStorage.setItem('supps_paused', JSON.stringify(paused));
+  const el = document.querySelector(`[data-supp-key="${key}"]`);
+  if (!el) return;
+  const isPaused = !!paused[key];
+  el.style.opacity = isPaused?'0.45':'';
+  const check = el.querySelector('.supp-check');
+  if (check) {
+    check.style.borderColor = isPaused?'var(--muted)':'';
+    check.innerHTML = isPaused
+      ? `<svg viewBox="0 0 12 12" width="10" height="10" fill="none" stroke="var(--muted)" stroke-width="2" stroke-linecap="round"><line x1="4" y1="3" x2="4" y2="9"/><line x1="8" y1="3" x2="8" y2="9"/></svg>`
+      : `<svg class="supp-check-mark" viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg>`;
+  }
+  el.onclick = isPaused?null:()=>toggleSupp(key);
+}
+let _suppHoldTimer = null;
+function startSuppHold(key) { _suppHoldTimer = setTimeout(()=>toggleSuppPause(key), 600); }
+function clearSuppHold() { clearTimeout(_suppHoldTimer); }
+
+function toggleSupp(key) {
+  const d = safeParseJSON(localStorage.getItem('supps_'+todayStr()))||{};
+  d[key] = !d[key];
+  localStorage.setItem('supps_'+todayStr(), JSON.stringify(d));
+  const el = document.querySelector(`[data-supp-key="${key}"]`);
+  if (el) el.classList.toggle('done', !!d[key]);
+  updateHabitsUI();
+  sb.from('body_logs').upsert({date:todayStr(),supps_done:d},{onConflict:'date'}).then(()=>{});
+}
+
+// ═══════════════════════════════════════════
+//  NUTRITION
+// ═══════════════════════════════════════════
+function getMacroLog(date) { return safeParseJSON(localStorage.getItem('macros_'+(date||todayStr()))); }
+function saveMacroLog(data) {
+  localStorage.setItem('macros_'+todayStr(), JSON.stringify(data));
+  sb.from('body_logs').upsert({date:todayStr(),macros:data},{onConflict:'date'}).then(()=>{});
+}
+
+function getMacroFeedback(actual, target, dayType) {
+  const msgs = [];
+  const kcalPct = actual.kcal / target.kcal;
+  const protDiff = actual.protein - target.protein;
+  const carbsDiff = actual.carbs - target.carbs;
+  const isTraining = dayType !== 'rest';
+
+  if (kcalPct < 0.80) msgs.push({color:'var(--red)', icon:'⚠️', text:`Under-fuelled (${actual.kcal} vs ${target.kcal} kcal). You cannot gain muscle or perform at your best in a significant deficit. Eat more — prioritise carbs and protein.`});
+  else if (kcalPct >= 0.80 && kcalPct < 0.93) msgs.push({color:'var(--yellow)', icon:'⚡', text:`Slightly below target. Acceptable, but aim for the full ${target.kcal} kcal on training days to maximise muscle gain.`});
+  else if (kcalPct >= 0.93 && kcalPct <= 1.15) msgs.push({color:'var(--green)', icon:'✅', text:`Calories on target — you are feeding muscle growth while keeping the surplus lean.`});
+  else if (kcalPct > 1.15) msgs.push({color:'var(--yellow)', icon:'📈', text:`Surplus above target (+${actual.kcal-target.kcal} kcal). Small excess is fine on hard days, but keep it controlled to stay lean.`});
+
+  if (protDiff < -20) msgs.push({color:'var(--red)', icon:'💪', text:`Protein too low (${actual.protein}g vs ${target.protein}g). Below the threshold to build and protect muscle. Add a shake or extra protein source today.`});
+  else if (protDiff >= -20 && protDiff <= 20) msgs.push({color:'var(--green)', icon:'💪', text:`Protein on target — muscle building is supported.`});
+
+  if (isTraining && actual.carbs < target.carbs * 0.7) msgs.push({color:'var(--red)', icon:'⚡', text:`Carbs too low for a training day. Your fencing and gym performance will suffer — carbs are the primary fuel for explosive work.`});
+  return msgs;
+}
+
+function buildMacroSection(dayType) {
+  const target = NUTRITION[dayType]||NUTRITION.single;
+  const actual = getMacroLog(todayStr());
+  const dayLabel = dayType==='double'?'Double Session':dayType==='single'?'Single Session':'Rest Day';
+  const macroBar = (label, val, tgt, color) => {
+    const pct = Math.min(100,Math.round(val/tgt*100));
+    const over = val > tgt;
+    return `<div style="margin-bottom:10px">
+      <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:4px">
+        <span style="color:var(--muted)">${label}</span>
+        <span style="color:${over?'var(--yellow)':'var(--text)'}">${val}<span style="color:var(--muted)"> / ${tgt}${label==='Kcal'?'':' g'}</span></span>
+      </div>
+      <div style="height:5px;background:var(--card2);border-radius:3px;overflow:hidden">
+        <div style="height:100%;width:${pct}%;background:${over?'var(--yellow)':color};border-radius:3px;transition:width .3s"></div>
+      </div>
+    </div>`;
+  };
+  const feedback = actual ? getMacroFeedback(actual, target, dayType) : [];
+  return `
+  <div class="sec-label" style="margin-top:16px">Nutrition <span style="color:var(--muted);font-weight:400;font-size:10px">${dayLabel} — gaining phase</span></div>
+  <div class="card" id="macro-card">
+    <div style="background:rgba(61,155,233,.08);border:1px solid rgba(61,155,233,.2);border-radius:8px;padding:8px 10px;margin-bottom:12px;font-size:11px;color:var(--accent);line-height:1.5">
+      💡 <strong>Goal: Lean muscle gain.</strong> Eat at or above target every day. Protein is non-negotiable at 130g. Carbs are your performance fuel — don't skip them on training days.
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:14px">
+      ${[{label:'Kcal',val:target.kcal,color:'var(--accent)'},{label:'Protein',val:target.protein,color:'var(--teal)'},{label:'Carbs',val:target.carbs,color:'var(--yellow)'},{label:'Fat',val:target.fat,color:'var(--purple)'}].map(m=>`<div style="background:var(--card2);border-radius:8px;padding:8px 6px;text-align:center"><div style="font-size:15px;font-weight:500;color:${m.color}">${m.val}</div><div style="font-size:9px;color:var(--muted);margin-top:1px">${m.label}</div></div>`).join('')}
+    </div>
+    ${actual ? `
+      <div style="border-top:1px solid var(--border);padding-top:12px;margin-bottom:8px">
+        <div style="font-size:11px;color:var(--muted);margin-bottom:10px;display:flex;justify-content:space-between"><span>Logged today</span><div style="display:flex;gap:10px"><button onclick="openMacroModal('add')" style="background:none;border:none;color:var(--green);font-size:11px;cursor:pointer;padding:0">＋ Add meal</button><button onclick="openMacroModal('edit')" style="background:none;border:none;color:var(--accent);font-size:11px;cursor:pointer;padding:0">Edit</button></div></div>
+        ${macroBar('Kcal',actual.kcal,target.kcal,'var(--accent)')}
+        ${macroBar('Protein',actual.protein,target.protein,'var(--teal)')}
+        ${macroBar('Carbs',actual.carbs,target.carbs,'var(--yellow)')}
+        ${macroBar('Fat',actual.fat,target.fat,'var(--purple)')}
+      </div>
+      ${feedback.map(f=>`<div style="background:var(--card2);border-left:3px solid ${f.color};border-radius:6px;padding:8px 10px;margin-bottom:6px;font-size:11px;color:var(--text);line-height:1.5">${f.icon} ${f.text}</div>`).join('')}
+    ` : `<button onclick="openMacroModal('add')" style="width:100%;padding:10px;background:none;border:1px dashed var(--border);border-radius:8px;color:var(--accent);cursor:pointer;font-size:12px;letter-spacing:.5px">＋ Log today's nutrition</button>`}
+  </div>`;
+}
+
+function openMacroModal(mode) {
+  const dayType = getDayType(getTodayInfo()?.weekIdx||0, getTodayInfo()?.dayIdx||0);
+  const target = NUTRITION[dayType]||NUTRITION.single;
+  const existing = getMacroLog(todayStr())||{kcal:0,protein:0,carbs:0,fat:0};
+  const isAdd = mode==='add'||!existing.kcal;
+  openModal(isAdd?'＋ Add meal':'Edit totals', `
+    ${existing.kcal&&isAdd?`<div style="background:var(--card2);border-radius:8px;padding:8px 10px;margin-bottom:12px;font-size:11px;color:var(--muted)">Current: <strong style="color:var(--text)">${existing.kcal} kcal · ${existing.protein}g P · ${existing.carbs}g C · ${existing.fat}g F</strong></div>`:''}
+    ${[{id:'f-kcal',label:'Calories (kcal)',hint:isAdd?`add to ${existing.kcal}`:`target ${target.kcal}`},{id:'f-protein',label:'Protein (g)',hint:isAdd?`add to ${existing.protein}g`:`target ${target.protein}g`},{id:'f-carbs',label:'Carbs (g)',hint:isAdd?`add to ${existing.carbs}g`:`target ${target.carbs}g`},{id:'f-fat',label:'Fat (g)',hint:isAdd?`add to ${existing.fat}g`:`target ${target.fat}g`}].map(f=>`<div class="form-field"><div class="form-label">${f.label} <span style="color:var(--muted);font-weight:300">· ${f.hint}</span></div><input class="form-input" id="${f.id}" type="number" placeholder="0"></div>`).join('')}
+    <input type="hidden" id="f-macro-mode" value="${isAdd?'add':'edit'}">
+  `, saveMacroModal);
+}
+
+function saveMacroModal() {
+  const mode = document.getElementById('f-macro-mode')?.value||'add';
+  const existing = getMacroLog(todayStr())||{kcal:0,protein:0,carbs:0,fat:0};
+  const input = {kcal:parseInt(document.getElementById('f-kcal')?.value)||0,protein:parseInt(document.getElementById('f-protein')?.value)||0,carbs:parseInt(document.getElementById('f-carbs')?.value)||0,fat:parseInt(document.getElementById('f-fat')?.value)||0};
+  const data = mode==='add'?{kcal:existing.kcal+input.kcal,protein:existing.protein+input.protein,carbs:existing.carbs+input.carbs,fat:existing.fat+input.fat}:input;
+  saveMacroLog(data); closeModal(); renderToday();
+}
+
+// ═══════════════════════════════════════════
+//  TODAY TAB
+// ═══════════════════════════════════════════
+async function renderToday() {
+  const info = getTodayInfo();
+  const el = document.getElementById('today-content');
+  if (!info) { el.innerHTML='<div class="empty-state"><div class="empty-state-title">Program Complete 🏆</div><p>22 weeks of work. You are not the same athlete who started.</p></div>'; return; }
+
+  el.innerHTML = '<div class="loading">Loading…</div>';
+  const week = PLAN[info.weekIdx];
+  const dayType = getDayType(info.weekIdx, info.dayIdx);
+
+  const [{data:doneLogs},{data:bodyRows}] = await Promise.all([
+    sb.from('session_logs').select('day_idx,slot').eq('week_idx',info.weekIdx),
+    sb.from('body_logs').select('*').eq('date',todayStr()).limit(1),
+  ]);
+
+  const isDone = (dIdx, slot) => {
+    const [,logD,logS] = resolveLogContext(info.weekIdx,dIdx,slot);
+    return doneLogs?.some(l=>l.day_idx===logD&&l.slot===logS)||false;
+  };
+  const bodyLog = bodyRows?.[0]||null;
+  const sleepScore = bodyLog?.sleep_score ?? (localStorage.getItem('sleep_'+todayStr())!==null ? parseInt(localStorage.getItem('sleep_'+todayStr())) : null);
+  const cond = getCondition(sleepScore);
+
+  const rawAm = resolveSession(info.weekIdx,info.dayIdx,'am');
+  const rawPm = resolveSession(info.weekIdx,info.dayIdx,'pm');
+  const isDouble = rawAm&&rawAm.t!=='rest'&&rawPm&&rawPm.t!=='rest';
+
+  let sessionHTML = buildSessionCard(PLAN[info.weekIdx].days[info.dayIdx].am, info.weekIdx, info.dayIdx, 'am', isDone(info.dayIdx,'am'), !!isDouble);
+  if (PLAN[info.weekIdx].days[info.dayIdx].pm) sessionHTML += buildSessionCard(PLAN[info.weekIdx].days[info.dayIdx].pm, info.weekIdx, info.dayIdx, 'pm', isDone(info.dayIdx,'pm'), true);
+
+  const waterTarget = dayType==='rest' ? 8 : 10;
+  const waterCount = parseInt(localStorage.getItem('water_'+todayStr())||'0');
+  const suppDone = safeParseJSON(localStorage.getItem('supps_'+todayStr()))||{};
+  const nut = NUTRITION[dayType]||NUTRITION.single;
+  const phColors=['','var(--green)','var(--yellow)','var(--accent)','var(--teal)'];
+  const phNames=['','Competition Ready','Foundation','Summer Build','Competition Season'];
+
+  // Iron deficiency alert
+  const ironAlert = parseInt(localStorage.getItem('iron_alert_dismissed')||'0') < 3 ? `
+    <div class="alert yellow" style="margin-bottom:12px">
+      <div class="alert-title">⚡ Energy & Fatigue</div>
+      If you still feel consistently tired, ask your doctor for a blood panel: iron, ferritin, B12, and D3. Low iron is common in female athletes and causes the fatigue, breathlessness, and low focus you described. It is 100% treatable — but only if you know about it.
+      <div style="margin-top:6px"><button onclick="this.closest('.alert').style.display='none';localStorage.setItem('iron_alert_dismissed',${(parseInt(localStorage.getItem('iron_alert_dismissed')||'0')+1)})" style="background:none;border:none;color:var(--yellow);font-size:11px;cursor:pointer;text-decoration:underline;padding:0">Dismiss</button></div>
+    </div>` : '';
+
+  el.innerHTML = `
+    ${buildQuoteBar()}
+    ${buildCompetitionCountdown()}
+    <div class="condition-card ${cond.level}">
+      <div class="condition-status">${cond.label}</div>
+      <div class="condition-msg">${cond.msg}</div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <span class="sleep-label">Polar score</span>
+        <span style="font-size:20px;font-weight:700;color:var(--text)">${sleepScore!==null?sleepScore:'—'}</span>
+        ${sleepScore===null?`<span style="font-size:10px;color:var(--muted)">· Log in Body tab</span>`:''}
+      </div>
+    </div>
+    <div class="sec-label">Today's Sessions</div>
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap">
+      <span class="chip"><span class="chip-dot" style="background:${phColors[week.ph]}"></span>Phase ${week.ph} · ${phNames[week.ph]}</span>
+      <span class="chip"><span class="chip-dot" style="background:var(--accent)"></span>${week.lbl} · Day ${info.dayIdx+1}</span>
+    </div>
+    ${ironAlert}
+    ${sessionHTML}
+    ${buildHabitsSection(suppDone, doneLogs)}
+    <div class="sec-label">Hydration</div>
+    <div class="water-card" data-target="${waterTarget}">
+      <div style="display:flex;justify-content:space-between;align-items:baseline">
+        <div class="water-total">${waterCount*250} ml</div>
+        <div style="font-size:11px;color:var(--muted)">Target ${waterTarget*250} ml · ${waterTarget} glasses</div>
+      </div>
+      <div class="water-glasses">
+        ${Array.from({length:waterTarget},(_,i)=>`<div class="glass ${i<waterCount?'filled':''}" onclick="logWater(${i<waterCount?i:i+1})"></div>`).join('')}
+      </div>
+      <div class="pbar-wrap"><div class="pbar-fill water-pbar" style="width:${Math.min(100,waterCount/waterTarget*100)}%;background:var(--accent)"></div></div>
+    </div>
+    <div class="sec-label">Supplements</div>
+    <div class="card">
+      <div style="font-size:10px;color:var(--muted);background:var(--card2);border-radius:6px;padding:7px 10px;margin-bottom:10px;line-height:1.5">💡 Hold any supplement 1 second to pause it if you don't have it. It'll be excluded from tracking.</div>
+      ${SUPPS.map(s=>{
+        const paused = getSuppPaused(s.key);
+        return `<div class="supp-item ${(suppDone[s.key]&&!paused)?'done':''} ${paused?'paused-supp':''}" data-supp-key="${s.key}"
+          onclick="${paused?'':'toggleSupp(\''+s.key+'\')'}"
+          oncontextmenu="event.preventDefault();toggleSuppPause('${s.key}')"
+          ontouchstart="startSuppHold('${s.key}')" ontouchend="clearSuppHold()" ontouchmove="clearSuppHold()"
+          style="${paused?'opacity:.45;':''}">
+          <div class="supp-check" style="${paused?'border-color:var(--muted)':''}">
+            ${paused
+              ? `<svg viewBox="0 0 12 12" width="10" height="10" fill="none" stroke="var(--muted)" stroke-width="2" stroke-linecap="round"><line x1="4" y1="3" x2="4" y2="9"/><line x1="8" y1="3" x2="8" y2="9"/></svg>`
+              : `<svg class="supp-check-mark" viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg>`}
+          </div>
+          <div style="flex:1;min-width:0">
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <span class="supp-name">${s.name}${paused?` <span style="font-size:9px;color:var(--muted);background:var(--card2);padding:1px 5px;border-radius:4px;margin-left:4px">paused</span>`:''}</span>
+              <span class="supp-time">${s.time}</span>
+            </div>
+            <div style="font-size:10px;color:var(--muted);line-height:1.4;margin-top:2px">${s.why}</div>
+          </div>
+        </div>`;
+      }).join('')}
+    </div>
+    ${buildMacroSection(dayType)}
+    <div style="height:16px"></div>
+  `;
+}
+
+function buildSessionCard(s, wIdx, dIdx, slot, done, isDouble) {
+  const resolved = resolveSession(wIdx, dIdx, slot);
+  if (resolved === null) return `<div class="sblock rest" style="opacity:.5;border-style:dashed">
+    <div class="sblock-tag" style="color:var(--muted)">Moved</div>
+    <div class="sblock-name" style="color:var(--muted)">${s?.n||''}</div>
+    <div class="sblock-detail" style="font-size:10px">Session moved to another day</div>
+    <div class="sblock-actions"><button class="btn-done" style="background:var(--card2)" onclick="undoSwap(${wIdx},${dIdx},'${slot}')">Undo Move</button></div>
+  </div>`;
+  if (!resolved || resolved.t==='rest') return `<div class="sblock rest"><div class="sblock-tag">Rest</div><div class="sblock-name">${resolved?.n||'Rest'}</div><div class="sblock-detail">${resolved?.d||''}</div></div>`;
+  const [logW,logD,logS] = resolveLogContext(wIdx,dIdx,slot);
+  const badge = isDouble&&slot==='am'?'<span class="double-badge">AM</span> ':isDouble&&slot==='pm'?'<span class="pm-badge">PM</span> ':'';
+  const isFuture = isFutureSession(wIdx,dIdx);
+  const isToday = sessionDate(wIdx,dIdx)===todayStr();
+  const canMove = (isFuture||isToday)&&!done;
+  return `<div class="sblock ${resolved.t} ${done?'done':''}">
+    ${badge}<div class="sblock-tag">${resolved.t}</div>
+    <div class="sblock-name">${resolved.n}</div>
+    <div class="sblock-detail">${resolved.d}</div>
+    ${resolved.dur?`<div class="sblock-dur">${resolved.dur}</div>`:''}
+    <div class="sblock-actions">
+      <button class="btn-log" onclick="openLogModal(${logW},${logD},'${logS}','${sessionDate(wIdx,dIdx)}')">${done?'✓ Edit Log':'Save Session'}</button>
+      ${canMove?`<button class="btn-done" style="background:var(--card2);color:var(--accent)" onclick="openMoveModal(${wIdx},${dIdx},'${slot}')">↔ Move</button>`:''}
+    </div>
+  </div>`;
+}
+
+// ═══════════════════════════════════════════
+//  PLAN TAB
+// ═══════════════════════════════════════════
+async function renderPlan() {
+  const info = getTodayInfo();
+  if (info && !planWeekInitialized) { planWeekIdx = info.weekIdx; planWeekInitialized = true; }
+  const el = document.getElementById('plan-content');
+  if (!el.innerHTML||el.innerHTML.includes('Loading')) el.innerHTML='<div class="loading">Loading…</div>';
+
+  const [{data:doneLogs},{data:allLogs}] = await Promise.all([
+    sb.from('session_logs').select('week_idx,day_idx,slot,data,type').eq('week_idx',planWeekIdx),
+    sb.from('session_logs').select('week_idx,slot,data,type'),
+  ]);
+
+  const isDone = (dIdx,slot) => {
+    const [,logD,logS] = resolveLogContext(planWeekIdx,dIdx,slot);
+    return doneLogs?.some(l=>l.day_idx===logD&&l.slot===logS)||false;
+  };
+
+  const phColors=['','var(--green)','var(--yellow)','var(--accent)','var(--teal)'];
+  const phNames=['','Competition Ready','Foundation','Summer Build','Competition Season'];
+  const week = PLAN[planWeekIdx];
+  const isCurrentWeek = info&&info.weekIdx===planWeekIdx;
+  const dayNames = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  const isPlanned = l=>l.slot&&l.slot!=='custom';
+  const sessionsDone = (doneLogs||[]).filter(isPlanned).length;
+  const totalDonePlanned = (allLogs||[]).filter(isPlanned).length;
+  const weeksComplete = info?info.weekIdx:0;
+  let scheduledUntilToday = 0;
+  if (info) {
+    PLAN.forEach((w,wi) => {
+      if (wi<info.weekIdx) { scheduledUntilToday+=w.sessions; }
+      else if (wi===info.weekIdx) {
+        w.days.forEach((day,di) => {
+          if (di<=info.dayIdx) {
+            if (day.am&&day.am.t!=='rest') scheduledUntilToday++;
+            if (day.pm&&day.pm.t!=='rest') scheduledUntilToday++;
+          }
+        });
+      }
+    });
+  }
+  const overallPct = Math.round(weeksComplete/TOTAL_WEEKS*100);
+
+  let navHTML=''; let lastPh=0;
+  PLAN.forEach((w,i) => {
+    if (w.ph!==lastPh){navHTML+=`<span class="phase-sep" style="color:${phColors[w.ph]}">P${w.ph}</span>`;lastPh=w.ph;}
+    const isPast = info&&i<info.weekIdx;
+    navHTML+=`<button class="wbtn ${i===planWeekIdx?'active':''}" onclick="selectPlanWeek(${i})"><span style="${isPast?'color:var(--green)':''}"> ${isPast?'✓':''}</span>${w.lbl}</button>`;
+  });
+
+  const gridHTML = dayNames.map((d,i) => {
+    const day=week.days[i]; const isToday=isCurrentWeek&&info&&info.dayIdx===i;
+    const isPastDay = info&&(planWeekIdx<info.weekIdx||(planWeekIdx===info.weekIdx&&i<info.dayIdx));
+    const rawAm=resolveSession(planWeekIdx,i,'am'); const rawPm=resolveSession(planWeekIdx,i,'pm');
+    const movedOutAm=rawAm===null&&isMovedOut(planWeekIdx,i,'am');
+    const movedOutPm=rawPm===null&&isMovedOut(planWeekIdx,i,'pm');
+    const resolvedAm=rawAm??day.am; const resolvedPm=rawPm??day.pm;
+    const [logWAm,logDAm,logSAm]=resolveLogContext(planWeekIdx,i,'am');
+    const [logWPm,logDPm,logSPm]=resolveLogContext(planWeekIdx,i,'pm');
+    const amBlock=buildSmallBlock(resolvedAm,planWeekIdx,i,'am',isDone(i,'am'),!!day.pm,movedOutAm,isPastDay,logWAm,logDAm,logSAm);
+    const pmBlock=(resolvedPm||movedOutPm)?buildSmallBlock(resolvedPm||{t:'rest',n:'Moved'},planWeekIdx,i,'pm',isDone(i,'pm'),true,movedOutPm,isPastDay,logWPm,logDPm,logSPm):'';
+    return `<div class="dcol ${isToday?'today-col':''}"><div class="dhead">${d}</div>${amBlock}${pmBlock}</div>`;
+  }).join('');
+
+  el.innerHTML = `
+    <div style="position:relative;background:linear-gradient(135deg,#0c0d10 0%,#151a22 100%);border:1px solid rgba(61,155,233,.25);border-radius:12px;padding:18px 16px;margin-bottom:12px;overflow:hidden;display:flex;align-items:center;gap:14px">
+      <svg viewBox="0 0 110 130" width="50" height="60" style="flex-shrink:0;opacity:0.95">
+        <path d="M55 6 L102 6 L102 80 Q102 112 55 124 Q8 112 8 80 Z" fill="#14161b" stroke="#3D9BE9" stroke-width="1.5"/>
+        <line x1="55" y1="18" x2="55" y2="95" stroke="#3D9BE9" stroke-width="2" stroke-linecap="round"/>
+        <line x1="45" y1="28" x2="65" y2="48" stroke="#3D9BE9" stroke-width="2.5" stroke-linecap="round"/>
+        <line x1="55" y1="18" x2="80" y2="38" stroke="white" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
+        <circle cx="55" cy="95" r="4" fill="#3D9BE9"/>
+        <text x="55" y="115" fill="white" font-family="'Helvetica Neue',Arial,sans-serif" font-size="8" font-weight="900" letter-spacing="1" text-anchor="middle">FENCING</text>
+      </svg>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:10px;letter-spacing:2px;color:#3D9BE9;font-weight:700;margin-bottom:2px">22-WEEK PROGRAM</div>
+        <div style="font-size:17px;font-weight:900;color:white;letter-spacing:-.3px;line-height:1.1">${info?`Week ${info.weekNum} · ${phNames[week?.ph||1]}`:'Loading…'}</div>
+        <div style="font-size:11px;color:#6e7a8a;margin-top:3px">${totalDonePlanned} of ${scheduledUntilToday} sessions done</div>
+        <div style="height:4px;background:rgba(255,255,255,0.07);border-radius:3px;overflow:hidden;margin-top:8px">
+          <div style="height:100%;width:${Math.min(100,Math.round(totalDonePlanned/Math.max(1,scheduledUntilToday)*100))}%;background:linear-gradient(90deg,#3D9BE9,#7EC8F0);border-radius:3px;transition:width .4s"></div>
+        </div>
+      </div>
+    </div>
+    <div class="week-nav">${navHTML}</div>
+    <div class="wstats">
+      <div class="wstat"><div class="wstat-val">${week.gym}</div><div class="wstat-lbl">gym days</div></div>
+      <div class="wstat"><div class="wstat-val">${week.sessions}</div><div class="wstat-lbl">sessions</div></div>
+      <div class="wstat"><div class="wstat-val">${week.fencing}</div><div class="wstat-lbl">fencing</div></div>
+      <div class="wstat"><div class="wstat-val" style="color:${phColors[week.ph]};font-size:10px;padding-top:4px">${phNames[week.ph].split(' ')[0]}</div><div class="wstat-lbl">phase ${week.ph}</div></div>
+    </div>
+    <div class="legend">
+      <div class="legend-item"><div class="legend-dot" style="background:var(--accent)"></div>Fencing</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--orange)"></div>Gym</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--green)"></div>Run</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--purple)"></div>Yoga</div>
+    </div>
+    <div class="day-grid">${gridHTML}</div>
+  `;
+}
+
+function buildSmallBlock(s,wIdx,dIdx,slot,done,isDouble,movedOut,isPastDay,logW,logD,logS) {
+  const slotLabel=isDouble&&slot==='am'?' AM':isDouble&&slot==='pm'?' PM':'';
+  if (movedOut) return `<div class="sblock-sm rest" style="opacity:.45;border-style:dashed"><div class="sm-tag" style="color:var(--muted)">moved${slotLabel}</div><div class="sm-name" style="color:var(--muted)">—</div></div>`;
+  const lw=logW??wIdx,ld=logD??dIdx,ls=logS??slot;
+  const canMove=s.t!=='rest'&&!done&&!isPastDay;
+  const moveBtn=canMove?`<button onclick="event.stopPropagation();openMoveModal(${wIdx},${dIdx},'${slot}')" style="position:absolute;top:4px;right:4px;background:rgba(61,155,233,0.12);border:none;border-radius:4px;width:18px;height:18px;display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0">
+    <svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="var(--accent)" stroke-width="1.8" stroke-linecap="round"><line x1="6" y1="1" x2="6" y2="11"/><line x1="1" y1="6" x2="11" y2="6"/></svg>
+  </button>`:'';
+  const clickAction=s.t!=='rest'&&!isPastDay?`openLogModal(${lw},${ld},'${ls}','${sessionDate(wIdx,dIdx)}')` :'';
+  const pastStyle=isPastDay&&!done?'opacity:0.5;':'';
+  return `<div class="sblock-sm ${s.t} ${done?'done-sm':''}" style="position:relative;${pastStyle}" ${clickAction?`onclick="${clickAction}"`:'overflow:hidden'}>
+    <div class="sm-tag" style="color:${typeColor(s.t)}">${s.t}${slotLabel}</div>
+    <div class="sm-name">${s.n}</div>
+    ${s.dur?`<div class="sm-dur">${s.dur}</div>`:''}
+    ${moveBtn}
+  </div>`;
+}
+
+function selectPlanWeek(idx) { planWeekIdx=idx; planWeekInitialized=true; renderPlan(); }
+
+// ═══════════════════════════════════════════
+//  LOG MODAL — FORMS
+// ═══════════════════════════════════════════
+async function openLogModal(wIdx, dIdx, slot, displayDate=null) {
+  const s = slot==='pm'?PLAN[wIdx]?.days[dIdx]?.pm:PLAN[wIdx]?.days[dIdx]?.am;
+  if (!s||s.t==='rest') { showToast('Session not found'); return; }
+  const sDate = displayDate||sessionDate(wIdx,dIdx);
+  const past = sDate < todayStr();
+  _logCtx = {wIdx,dIdx,slot,session:s,date:sDate,isPast:past};
+  _extraExCount = 0;
+
+  if (s.t==='strength') {
+    const {data:latestLogs} = await sb.from('session_logs').select('data,created_at').eq('type','strength').order('created_at',{ascending:false}).limit(30);
+    if (latestLogs) {
+      const seen = {};
+      for (const log of latestLogs) {
+        for (const ex of log.data?.exercises||[]) {
+          if (!seen[ex.name]&&ex.sets?.length) {
+            const maxKg = Math.max(...ex.sets.map(s=>s.kg||0));
+            if (maxKg>0) { seen[ex.name]=true; USER.lifts[ex.name]={w:maxKg,r:ex.sets.at(-1)?.reps||5}; }
+          }
+        }
+      }
+    }
+  }
+
+  const forms = {
+    strength: buildStrengthForm(s),
+    fencing:  buildFencingForm(s),
+    run:      buildRunForm(s),
+    yoga:     buildYogaForm(s),
+  };
+  const form = forms[s.t] || buildFencingForm(s);
+  const warning = past ? `<div class="alert yellow" style="margin-bottom:14px"><div class="alert-title">Past Session</div>Logging for <strong>${sDate}</strong> — updates your historical record.</div>` : '';
+  openModal('Log · '+s.n, warning+form, saveLogSession);
+}
+
+function buildStrengthForm(s) {
+  const phase = getPhaseForSession();
+  const exList = getExercisesForSession(s.n);
+  return exList.map((ex,ei)=>{
+    const sets = getSetsCount(ei,phase);
+    const lift = USER.lifts[ex.name];
+    const lastKg = lift?lift.w:null;
+    const rows = Array.from({length:sets},(_,si)=>`
+      <div class="set-row" id="set-${ei}-${si}">
+        <span class="set-num">${si+1}</span>
+        <input class="set-input" id="reps-${ei}-${si}" type="number" value="${ex.reps}" placeholder="${ex.reps}">
+        <input class="set-input" id="kg-${ei}-${si}" type="number" placeholder="${lastKg!==null?lastKg:'kg'}">
+        <span style="width:18px"></span>
+      </div>`).join('');
+    return `<div class="exercise-block" id="ex-block-${ei}">
+      <div class="exercise-name-row">
+        <span class="exercise-name">${ex.name}</span>
+        <span style="display:flex;align-items:center;gap:10px">
+          <span class="exercise-hint">${sets}×${ex.reps}${lastKg!==null?' · Last: '+lastKg+'kg':''}</span>
+          <button onclick="removeExercise(${ei})" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:16px;line-height:1;padding:0">✕</button>
+        </span>
+      </div>
+      <div style="font-size:10px;color:var(--muted);margin-bottom:6px;font-style:italic">${ex.note||''}</div>
+      <div class="sets-header"><span class="sets-hdr-lbl">Set</span><span class="sets-hdr-lbl">Reps</span><span class="sets-hdr-lbl">kg</span><span></span></div>
+      <div id="sets-${ei}">${rows}</div>
+      <button class="btn-add-set" onclick="addSet(${ei})">+ add set</button>
+      <div class="divider"></div>
+    </div>`;
+  }).join('')+`
+  <div id="extra-exercises"></div>
+  <button class="btn-add-set" style="width:100%;margin-bottom:12px;font-size:12px;padding:10px 0;border-radius:8px;border:1px dashed var(--border);background:none;color:var(--accent);cursor:pointer;letter-spacing:.5px" onclick="showExercisePicker()">＋ Add exercise</button>
+  <div id="ex-picker" style="display:none;background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:10px;margin-bottom:12px;max-height:200px;overflow-y:auto"></div>
+  <div class="form-row">
+    <div class="form-field"><div class="form-label">Duration (mm:ss)</div><input class="form-input" id="f-dur" type="text" placeholder="60:00"></div>
+    <div class="form-field"><div class="form-label">Avg HR (bpm)</div><input class="form-input" id="f-hr" type="number" placeholder="128"></div>
+  </div>
+  <div class="form-field"><div class="form-label">Notes</div><input class="form-input" id="f-notes" type="text" placeholder="Energy, PRs, how did it feel?"></div>`;
+}
+
+function buildFencingForm(s) { return `
+  <div class="form-row">
+    <div class="form-field"><div class="form-label">Energy Level (1–10)</div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <input class="sleep-range" id="f-energy" type="range" min="1" max="10" value="7" oninput="document.getElementById('f-energy-val').textContent=this.value">
+        <span id="f-energy-val" style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--accent);min-width:20px">7</span>
+      </div>
+    </div>
+    <div class="form-field"><div class="form-label">Mental Focus (1–10)</div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <input class="sleep-range" id="f-focus" type="range" min="1" max="10" value="7" oninput="document.getElementById('f-focus-val').textContent=this.value">
+        <span id="f-focus-val" style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--green);min-width:20px">7</span>
+      </div>
+    </div>
+  </div>
+  <div class="form-field"><div class="form-label">Technical Performance (1–10)</div>
+    <div style="display:flex;align-items:center;gap:8px">
+      <input class="sleep-range" id="f-technique" type="range" min="1" max="10" value="7" oninput="document.getElementById('f-tech-val').textContent=this.value">
+      <span id="f-tech-val" style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--yellow);min-width:20px">7</span>
+    </div>
+  </div>
+  <div class="form-field"><div class="form-label">Notes — what went well? what to work on?</div><textarea class="form-input" id="f-notes" placeholder="Footwork felt sharp · struggled with distance management · …"></textarea></div>`; }
+
+function buildRunForm(s) { return `
+  <div class="form-row">
+    <div class="form-field"><div class="form-label">Distance (km)</div><input class="form-input" id="f-dist" type="number" step="0.1" placeholder="3.0"></div>
+    <div class="form-field"><div class="form-label">Duration (mm:ss)</div><input class="form-input" id="f-dur" type="text" placeholder="25:00"></div>
+  </div>
+  <div class="form-row">
+    <div class="form-field"><div class="form-label">Avg HR (bpm)</div><input class="form-input" id="f-hr" type="number" placeholder="138"></div>
+    <div class="form-field"><div class="form-label">Feel (1–10)</div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <input class="sleep-range" id="f-rpe" type="range" min="1" max="10" value="6" oninput="document.getElementById('f-rpe-val').textContent=this.value">
+        <span id="f-rpe-val" style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--accent);min-width:20px">6</span>
+      </div>
+    </div>
+  </div>
+  <div class="form-field"><div class="form-label">Hip check</div>
+    <select class="form-select" id="f-hip-ok">
+      <option value="fine">Hip felt fine ✓</option>
+      <option value="minor">Minor discomfort</option>
+      <option value="pain">Pain — stop and stretch</option>
+    </select>
+  </div>
+  <div class="form-field"><div class="form-label">Notes</div><input class="form-input" id="f-notes" type="text" placeholder="How did it feel? Anything unusual?"></div>`; }
+
+function buildYogaForm(s) { return `
+  <div class="form-row">
+    <div class="form-field"><div class="form-label">Duration (min)</div><input class="form-input" id="f-duration" type="number" placeholder="60"></div>
+    <div class="form-field"><div class="form-label">Hip & back (1=stiff, 10=great)</div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <input class="sleep-range" id="f-hip" type="range" min="1" max="10" value="6" oninput="document.getElementById('f-hip-val').textContent=this.value">
+        <span id="f-hip-val" style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--green);min-width:20px">6</span>
+      </div>
+    </div>
+  </div>
+  <div class="form-field"><div class="form-label">Focus areas today</div><input class="form-input" id="f-notes" type="text" placeholder="Hip flexors · lower back · hamstrings…"></div>`; }
+
+function showExercisePicker() {
+  const picker = document.getElementById('ex-picker');
+  if (!picker) return;
+  if (picker.style.display!=='none') { picker.style.display='none'; return; }
+  const allEx=[]; const seen=new Set();
+  Object.values(EXERCISES).forEach(arr=>arr.forEach(ex=>{if(!seen.has(ex.name)){seen.add(ex.name);allEx.push(ex);}}));
+  picker.innerHTML = allEx.map(ex=>`<div onclick="addExerciseBlock('${ex.name.replace(/'/g,"\\'")}',${ex.reps},'${(ex.note||'').replace(/'/g,"\\'")}');document.getElementById('ex-picker').style.display='none'" style="padding:8px 6px;border-bottom:1px solid var(--border);cursor:pointer;font-size:13px;color:var(--text)">${ex.name} <span style="color:var(--muted);font-size:11px">· ${ex.reps} reps</span></div>`).join('');
+  picker.style.display='block';
+}
+
+function addExerciseBlock(exName, targetReps, exNote) {
+  const container = document.getElementById('extra-exercises'); if (!container) return;
+  const ei = 1000 + _extraExCount++;
+  const lift = USER.lifts[exName]; const lastKg = lift?lift.w:null;
+  const rows = Array.from({length:3},(_,si)=>`<div class="set-row"><span class="set-num">${si+1}</span><input class="set-input" id="reps-${ei}-${si}" type="number" value="${targetReps}" placeholder="${targetReps}"><input class="set-input" id="kg-${ei}-${si}" type="number" placeholder="${lastKg!==null?lastKg:'kg'}"><span style="width:18px"></span></div>`).join('');
+  container.insertAdjacentHTML('beforeend',`<div class="exercise-block" id="ex-block-${ei}">
+    <div class="exercise-name-row"><span class="exercise-name">${exName}</span><span style="display:flex;align-items:center;gap:10px"><span class="exercise-hint">3×${targetReps}${lastKg!==null?' · Last: '+lastKg+'kg':''}</span><button onclick="removeExercise(${ei})" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:16px;line-height:1;padding:0">✕</button></span></div>
+    <div style="font-size:10px;color:var(--muted);margin-bottom:6px;font-style:italic">${exNote}</div>
+    <div class="sets-header"><span class="sets-hdr-lbl">Set</span><span class="sets-hdr-lbl">Reps</span><span class="sets-hdr-lbl">kg</span><span></span></div>
+    <div id="sets-${ei}">${rows}</div>
+    <button class="btn-add-set" onclick="addSet(${ei})">+ add set</button>
+    <div class="divider"></div>
+  </div>`);
+}
+
+function addSet(ei) {
+  const c=document.getElementById('sets-'+ei); const si=c.children.length;
+  c.insertAdjacentHTML('beforeend',`<div class="set-row"><span class="set-num">${si+1}</span><input class="set-input" id="reps-${ei}-${si}" type="number" placeholder="—"><input class="set-input" id="kg-${ei}-${si}" type="number" placeholder="—"><span style="width:18px"></span></div>`);
+}
+function removeExercise(ei) { const b=document.getElementById('ex-block-'+ei); if(b) b.style.display='none'; }
+
+async function saveLogSession() {
+  if (!_logCtx) return;
+  const {wIdx,dIdx,slot,session:s,date} = _logCtx;
+  let data = {};
+
+  if (s.t==='strength') {
+    const exercises=[];
+    document.querySelectorAll('.exercise-block').forEach(block=>{
+      if (block.style.display==='none') return;
+      const name=block.querySelector('.exercise-name')?.textContent?.trim();
+      if (!name) return;
+      const sets=[];
+      block.querySelectorAll('.set-row').forEach(row=>{
+        const repsInput=row.querySelector('[id^="reps-"]');
+        const kgInput=row.querySelector('[id^="kg-"]');
+        if (!repsInput||!kgInput) return;
+        const reps=parseInt(repsInput.value)||0;
+        const kg=parseFloat(kgInput.value)||0;
+        if (reps>0||kg>0) sets.push({reps,kg});
+      });
+      if (sets.length) exercises.push({name,sets});
+    });
+    data={exercises,duration:document.getElementById('f-dur')?.value||'',hr:parseInt(document.getElementById('f-hr')?.value)||null,notes:document.getElementById('f-notes')?.value||''};
+  } else if (s.t==='fencing') {
+    data={energy:parseInt(document.getElementById('f-energy')?.value)||null,focus:parseInt(document.getElementById('f-focus')?.value)||null,technique:parseInt(document.getElementById('f-technique')?.value)||null,notes:document.getElementById('f-notes')?.value||''};
+  } else if (s.t==='run') {
+    data={distance:parseFloat(document.getElementById('f-dist')?.value)||0,duration:document.getElementById('f-dur')?.value||'',hr:parseInt(document.getElementById('f-hr')?.value)||null,rpe:parseInt(document.getElementById('f-rpe')?.value)||null,hip_ok:document.getElementById('f-hip-ok')?.value||'fine',notes:document.getElementById('f-notes')?.value||''};
+  } else if (s.t==='yoga') {
+    data={duration:parseInt(document.getElementById('f-duration')?.value)||null,hip_feel:parseInt(document.getElementById('f-hip')?.value)||null,notes:document.getElementById('f-notes')?.value||''};
+  }
+
+  try {
+    await sb.from('session_logs').insert({date,week_idx:wIdx,day_idx:dIdx,slot,type:s.t,name:s.n,data});
+    showToast('Session saved ✓');
+  } catch(e) { showToast('Error saving — check Supabase connection'); console.error(e); }
+  closeModal();
+  if (activePanel==='today') renderToday();
+  if (activePanel==='plan')  renderPlan();
+  if (activePanel==='log')   renderLog();
+}
+
+async function markDone(wIdx, dIdx, slot) {
+  const week=PLAN[wIdx]; const s=slot==='pm'?week.days[dIdx].pm:week.days[dIdx].am;
+  if (!s) return;
+  const sDate=sessionDate(wIdx,dIdx);
+  if (isPastSession(wIdx,dIdx)) { if (!confirm(`This session was on ${sDate}. Mark done in historical log?`)) return; }
+  await sb.from('session_logs').insert({date:sDate,week_idx:wIdx,day_idx:dIdx,slot,type:s.t,name:s.n,data:{completed:true}});
+  if (activePanel==='today') renderToday();
+  if (activePanel==='plan')  renderPlan();
+}
+
+// ═══════════════════════════════════════════
+//  LOG TAB
+// ═══════════════════════════════════════════
+async function renderLog() {
+  const el = document.getElementById('log-content');
+  el.innerHTML='<div class="loading">Loading…</div>';
+  const {data:logs} = await sb.from('session_logs').select('*').order('created_at',{ascending:false}).limit(60);
+  if (!logs||!logs.length) { el.innerHTML='<div class="empty-state"><div class="empty-state-title">No Sessions Yet</div><p>Log your first session from the Today or Plan tab.</p></div>'; return; }
+
+  const groups = {};
+  logs.forEach(l=>{
+    const wk = `Week ${(l.week_idx||0)+1}`;
+    if (!groups[wk]) groups[wk]=[];
+    groups[wk].push(l);
+  });
+
+  let html = '';
+  for (const [wk, items] of Object.entries(groups)) {
+    html += `<div style="font-family:'Bebas Neue',sans-serif;font-size:12px;letter-spacing:2px;color:var(--muted);margin:16px 0 8px">${wk}</div>`;
+    items.forEach(l=>{
+      const metrics = buildLogMetrics(l);
+      html += `<div class="log-recent-item" onclick="openLogDetail(${JSON.stringify(l).replace(/"/g,'&quot;')})">
+        <div class="log-ri-top">
+          <span class="log-ri-name"><span style="color:${typeColor(l.type)};font-size:9px;text-transform:uppercase;letter-spacing:.5px;margin-right:6px">${l.type}</span>${l.name}</span>
+          <span class="log-ri-date">${l.date||''}</span>
+        </div>
+        <div class="log-ri-metrics">${metrics}</div>
+      </div>`;
+    });
+  }
+  el.innerHTML = html;
+}
+
+function buildLogMetrics(l) {
+  const d = l.data||{};
+  if (l.type==='strength') {
+    const sets = (d.exercises||[]).reduce((s,e)=>s+(e.sets?.length||0),0);
+    const topKg = (d.exercises||[]).reduce((max,e)=>Math.max(max,...(e.sets||[]).map(s=>s.kg||0)),0);
+    return `<em>${(d.exercises||[]).length} exercises</em> · ${sets} sets${topKg?` · top <em>${topKg}kg</em>`:''}${d.duration?` · ${d.duration}`:''}`;
+  }
+  if (l.type==='fencing') return `Energy <em>${d.energy||'—'}/10</em> · Focus <em>${d.focus||'—'}/10</em> · Technique <em>${d.technique||'—'}/10</em>`;
+  if (l.type==='run') return `<em>${d.distance||'—'} km</em>${d.duration?` · ${d.duration}`:''}${d.hr?` · ${d.hr} bpm`:''}`;
+  if (l.type==='yoga') return `<em>${d.duration||'—'} min</em>${d.hip_feel?` · hip <em>${d.hip_feel}/10</em>`:''}`;
+  return d.notes||'';
+}
+
+function openLogDetail(l) {
+  const d = l.data||{};
+  let body='';
+  if (l.type==='strength') {
+    body=(d.exercises||[]).map(ex=>`<div style="margin-bottom:10px"><div style="font-size:12px;font-weight:500;color:var(--text);margin-bottom:4px">${ex.name}</div>
+      <div style="display:grid;grid-template-columns:28px 1fr 1fr;gap:4px;font-size:10px;color:var(--muted);margin-bottom:3px"><span>Set</span><span style="text-align:center">Reps</span><span style="text-align:center">kg</span></div>
+      ${(ex.sets||[]).map((s,i)=>`<div style="display:grid;grid-template-columns:28px 1fr 1fr;gap:4px;font-size:11px;color:var(--text);margin-bottom:2px"><span style="color:var(--muted)">${i+1}</span><span style="text-align:center">${s.reps||'—'}</span><span style="text-align:center">${s.kg||'—'}</span></div>`).join('')}
+    </div>`).join('<div class="divider"></div>');
+    if (d.duration||d.notes) body+=`<div class="divider"></div><div class="card-row"><div class="lbl">Duration</div><div class="val">${d.duration||'—'}</div></div>`;
+    if (d.notes) body+=`<div class="card-row"><div class="lbl">Notes</div><div class="val">${d.notes}</div></div>`;
+  } else if (l.type==='fencing') {
+    body=`<div class="stat-grid">
+      <div class="stat-tile"><div class="stat-val" style="color:var(--accent)">${d.energy||'—'}<span style="font-size:14px">/10</span></div><div class="stat-lbl">Energy</div></div>
+      <div class="stat-tile"><div class="stat-val" style="color:var(--green)">${d.focus||'—'}<span style="font-size:14px">/10</span></div><div class="stat-lbl">Focus</div></div>
+      <div class="stat-tile"><div class="stat-val" style="color:var(--yellow)">${d.technique||'—'}<span style="font-size:14px">/10</span></div><div class="stat-lbl">Technique</div></div>
+    </div>${d.notes?`<div style="background:var(--card2);border-radius:8px;padding:10px 12px;font-size:12px;color:var(--text);line-height:1.6">${d.notes}</div>`:''}`;
+  } else if (l.type==='run') {
+    body=`<div class="stat-grid">
+      <div class="stat-tile"><div class="stat-val">${d.distance||'—'}</div><div class="stat-lbl">km</div></div>
+      <div class="stat-tile"><div class="stat-val">${d.duration||'—'}</div><div class="stat-lbl">time</div></div>
+      <div class="stat-tile"><div class="stat-val">${d.hr||'—'}</div><div class="stat-lbl">avg HR</div></div>
+      <div class="stat-tile"><div class="stat-val" style="color:${d.hip_ok==='pain'?'var(--red)':d.hip_ok==='minor'?'var(--yellow)':'var(--green)'}">${d.hip_ok||'—'}</div><div class="stat-lbl">hip</div></div>
+    </div>${d.notes?`<div style="font-size:11px;color:var(--muted);margin-top:8px">${d.notes}</div>`:''}`;
+  } else if (l.type==='yoga') {
+    body=`<div class="stat-grid">
+      <div class="stat-tile"><div class="stat-val">${d.duration||'—'}</div><div class="stat-lbl">minutes</div></div>
+      <div class="stat-tile"><div class="stat-val" style="color:var(--green)">${d.hip_feel||'—'}</div><div class="stat-lbl">hip feel /10</div></div>
+    </div>${d.notes?`<div style="font-size:11px;color:var(--muted);margin-top:8px">${d.notes}</div>`:''}`;
+  }
+  openModal(l.name, `<div style="font-size:11px;color:var(--muted);margin-bottom:12px">${l.date}</div>${body}`, null);
+}
+
+// ═══════════════════════════════════════════
+//  STATS TAB
+// ═══════════════════════════════════════════
+async function renderStats() {
+  const el = document.getElementById('stats-content');
+  el.innerHTML='<div class="loading">Loading…</div>';
+  const [{data:sessionLogs},{data:bodyLogs}] = await Promise.all([
+    sb.from('session_logs').select('*').order('date',{ascending:true}).limit(200),
+    sb.from('body_logs').select('*').order('date',{ascending:true}).limit(200),
+  ]);
+
+  Object.values(chartInstances).forEach(c=>{ try{c.destroy();}catch(e){} });
+  chartInstances={};
+
+  const chartOpts = (yLabel) => ({responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>ctx.parsed.y+' '+yLabel}}},scales:{x:{grid:{color:'rgba(255,255,255,0.05)'},ticks:{color:'#6e7a8a',font:{size:9},maxTicksLimit:6}},y:{grid:{color:'rgba(255,255,255,0.05)'},ticks:{color:'#6e7a8a',font:{size:9}}}}});
+
+  const mkChart = (id,type,labels,datasets,yLabel) => {
+    const canvas=document.getElementById(id); if (!canvas) return;
+    chartInstances[id]=new Chart(canvas,{type,data:{labels,datasets},options:chartOpts(yLabel)});
+  };
+
+  // Bodyweight
+  const bwData = (bodyLogs||[]).filter(l=>l.weight_kg).map(l=>({x:l.date,y:l.weight_kg}));
+  // Sleep
+  const sleepData = (bodyLogs||[]).filter(l=>l.sleep_score!=null).map(l=>({x:l.date,y:l.sleep_score}));
+  // Fencing quality
+  const fencingLogs = (sessionLogs||[]).filter(l=>l.type==='fencing'&&l.data);
+  const fencingQuality = fencingLogs.map(l=>({x:l.date,y:Math.round(((l.data.energy||0)+(l.data.focus||0)+(l.data.technique||0))/3*10)/10}));
+  // Main lift (trap bar DL)
+  const liftLogs = (sessionLogs||[]).filter(l=>l.type==='strength'&&l.data?.exercises);
+  const liftProgress = [];
+  liftLogs.forEach(l=>{
+    const dl = l.data.exercises.find(e=>e.name==='Trap bar deadlift');
+    if (dl?.sets?.length) {
+      const max = Math.max(...dl.sets.map(s=>s.kg||0));
+      if (max>0) liftProgress.push({x:l.date,y:max});
+    }
+  });
+  // Pull-ups
+  const pullProgress = [];
+  liftLogs.forEach(l=>{
+    const pu = l.data.exercises.find(e=>e.name==='Weighted pull-ups');
+    if (pu?.sets?.length) {
+      const max = Math.max(...pu.sets.map(s=>s.kg||0));
+      pullProgress.push({x:l.date,y:max});
+    }
+  });
+  // Supplement adherence (7-day rolling)
+  const suppData = (bodyLogs||[]).filter(l=>l.supps_done).map(l=>{
+    const done = Object.values(l.supps_done||{}).filter(Boolean).length;
+    return {x:l.date,y:Math.round(done/SUPPS.length*100)};
+  });
+
+  el.innerHTML = `
+    <div class="chart-wrap"><div class="chart-title">Bodyweight — Target ${USER.targetWeight}kg</div><div class="chart-canvas-wrap"><canvas id="c-weight"></canvas></div></div>
+    <div class="chart-wrap"><div class="chart-title">Trap Bar Deadlift — Max kg per session</div><div class="chart-canvas-wrap"><canvas id="c-dl"></canvas></div></div>
+    <div class="chart-wrap"><div class="chart-title">Pull-ups — Added weight (kg)</div><div class="chart-canvas-wrap"><canvas id="c-pullups"></canvas></div></div>
+    <div class="chart-wrap"><div class="chart-title">Fencing Session Quality — avg score /10</div><div class="chart-canvas-wrap"><canvas id="c-fencing"></canvas></div></div>
+    <div class="chart-wrap"><div class="chart-title">Sleep Score</div><div class="chart-canvas-wrap"><canvas id="c-sleep"></canvas></div></div>
+    <div class="chart-wrap"><div class="chart-title">Supplement Adherence %</div><div class="chart-canvas-wrap"><canvas id="c-supps"></canvas></div></div>
+  `;
+
+  const line = (data,color) => [{data,borderColor:color,backgroundColor:color.replace(')',',0.1)').replace('var(--','rgba(').replace(':',''),borderWidth:2,pointRadius:3,pointBackgroundColor:color,tension:.3}];
+
+  if (bwData.length) { mkChart('c-weight','line',bwData.map(p=>p.x),line(bwData.map(p=>p.y),'#3D9BE9'),'kg'); }
+  if (liftProgress.length) { mkChart('c-dl','line',liftProgress.map(p=>p.x),line(liftProgress.map(p=>p.y),'#E8834B'),'kg'); }
+  if (pullProgress.length) { mkChart('c-pullups','line',pullProgress.map(p=>p.x),line(pullProgress.map(p=>p.y),'#4CAF82'),'kg'); }
+  if (fencingQuality.length) { mkChart('c-fencing','line',fencingQuality.map(p=>p.x),[{data:fencingQuality.map(p=>p.y),borderColor:'#3D9BE9',backgroundColor:'rgba(61,155,233,0.1)',borderWidth:2,pointRadius:3,pointBackgroundColor:'#3D9BE9',tension:.3}],'/10'); }
+  if (sleepData.length) { mkChart('c-sleep','line',sleepData.map(p=>p.x),line(sleepData.map(p=>p.y),'#9B7FE8'),'score'); }
+  if (suppData.length) { mkChart('c-supps','bar',suppData.map(p=>p.x),[{data:suppData.map(p=>p.y),backgroundColor:'rgba(76,175,130,0.5)',borderColor:'#4CAF82',borderWidth:1}],'%'); }
+}
+
+// ═══════════════════════════════════════════
+//  BODY TAB
+// ═══════════════════════════════════════════
+async function renderBody() {
+  const el = document.getElementById('body-content');
+  el.innerHTML='<div class="loading">Loading…</div>';
+  const [{data:recentLogs},{data:injuries}] = await Promise.all([
+    sb.from('body_logs').select('*').order('date',{ascending:false}).limit(14),
+    sb.from('injuries').select('*').order('date',{ascending:false}),
+  ]);
+
+  const latest = recentLogs?.[0];
+  const localSleep = localStorage.getItem('sleep_'+todayStr());
+  const sleepVal = latest?.sleep_score ?? (localSleep!==null?parseInt(localSleep):null);
+
+  // Pre-populate with Marleen's known hip injury if no injuries in DB
+  let injuryHTML = '';
+  if (!injuries||!injuries.length) {
+    injuryHTML = `<div class="injury-item">
+      <div class="injury-top"><span class="injury-part">Left Hip — radiates to knee & back</span><span class="injury-badge badge-monitoring">Monitoring</span></div>
+      <div class="injury-desc">Pain from lunge mechanics — appears during running without warmup and Bulgarian split squats. No pain during fencing. Monitor and avoid high-impact without warmup. Prioritise hip flexor stretching daily.</div>
+    </div>`;
+  } else {
+    injuryHTML = injuries.map(inj=>`<div class="injury-item">
+      <div class="injury-top"><span class="injury-part">${inj.area}</span><span class="injury-badge badge-${inj.severity==='active'?'active':inj.severity==='monitoring'?'monitoring':'resolved'}">${inj.severity}</span></div>
+      <div class="injury-desc">${inj.notes||''}</div>
+    </div>`).join('');
+  }
+
+  el.innerHTML = `
+    <div class="sec-label">Body Metrics</div>
+    <div class="card">
+      <div class="card-row"><div class="lbl">Name</div><div class="val">Marleen Buitenhuis</div></div>
+      <div class="card-row"><div class="lbl">Age / Height</div><div class="val">25 · 172 cm</div></div>
+      <div class="card-row"><div class="lbl">Start weight</div><div class="val">55 kg</div></div>
+      <div class="card-row"><div class="lbl">Target weight</div><div class="val"><em>${USER.targetWeight} kg</em> — lean muscle gain</div></div>
+      <div class="card-row"><div class="lbl">Latest weight</div><div class="val">${latest?.weight_kg||'—'} kg</div></div>
+      <div class="card-row"><div class="lbl">Body fat %</div><div class="val">${latest?.body_fat_pct||'—'} %</div></div>
+      <div class="card-row"><div class="lbl">Sleep score</div><div class="val">${sleepVal!==null?sleepVal+'/100':'—'}</div></div>
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:12px">
+      <button class="btn-primary" style="font-size:13px;padding:10px" onclick="openBodyLog()">＋ Log today</button>
+      <button class="btn-secondary" style="margin:0;font-size:12px;padding:10px" onclick="openSleepModal()">Log Sleep Score</button>
+    </div>
+    <div class="sec-label">Recent Entries</div>
+    ${(recentLogs||[]).slice(0,7).map(l=>`<div style="background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:8px 12px;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center">
+      <div style="font-size:11px;color:var(--muted)">${l.date}</div>
+      <div style="font-size:12px;color:var(--text);display:flex;gap:12px">
+        ${l.weight_kg?`<span>⚖️ <em style="color:var(--accent)">${l.weight_kg}</em> kg</span>`:''}
+        ${l.sleep_score!=null?`<span>😴 <em style="color:var(--purple)">${l.sleep_score}</em></span>`:''}
+        ${l.body_fat_pct?`<span>📊 <em>${l.body_fat_pct}</em>%</span>`:''}
+      </div>
+    </div>`).join('')||'<div style="font-size:12px;color:var(--muted);text-align:center;padding:16px">No entries yet — log your first metrics above.</div>'}
+    <div class="sec-label">Injuries & Monitoring</div>
+    ${injuryHTML}
+    <button class="add-btn" onclick="openInjuryModal()">+ Log new injury or note</button>
+    <div style="height:16px"></div>
+  `;
+}
+
+function openBodyLog() {
+  openModal('Log Body Metrics', `
+    <div class="form-row">
+      <div class="form-field"><div class="form-label">Weight (kg)</div><input class="form-input" id="bl-weight" type="number" step="0.1" placeholder="55.0"></div>
+      <div class="form-field"><div class="form-label">Body fat %</div><input class="form-input" id="bl-bf" type="number" step="0.1" placeholder="—"></div>
+    </div>
+    <div class="form-field"><div class="form-label">Polar sleep score (0–100)</div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <input class="sleep-range" id="bl-sleep" type="range" min="0" max="100" value="70" oninput="document.getElementById('bl-sleep-val').textContent=this.value" style="flex:1">
+        <span id="bl-sleep-val" style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:var(--accent);min-width:40px">70</span>
+      </div>
+    </div>
+    <div class="form-field"><div class="form-label">Notes</div><input class="form-input" id="bl-notes" type="text" placeholder="How are you feeling today?"></div>
+  `, async ()=>{
+    const weight = parseFloat(document.getElementById('bl-weight')?.value)||null;
+    const bf = parseFloat(document.getElementById('bl-bf')?.value)||null;
+    const sleep = parseInt(document.getElementById('bl-sleep')?.value)||null;
+    const notes = document.getElementById('bl-notes')?.value||'';
+    const row = {date:todayStr()};
+    if (weight) row.weight_kg=weight;
+    if (bf) row.body_fat_pct=bf;
+    if (sleep!=null) { row.sleep_score=sleep; localStorage.setItem('sleep_'+todayStr(),sleep); }
+    if (notes) row.notes=notes;
+    await sb.from('body_logs').upsert(row,{onConflict:'date'});
+    showToast('Saved ✓');
+    closeModal();
+    renderBody();
+    if (activePanel==='today') renderToday();
+  });
+}
+
+function openSleepModal() {
+  openModal('Log Sleep Score', `
+    <div style="font-size:12px;color:var(--muted);line-height:1.5;margin-bottom:12px">Enter your Polar Nightly Recharge score. Higher = better recovered. This drives the condition card on your Today tab.</div>
+    <div style="display:flex;align-items:center;gap:10px">
+      <input class="sleep-range" id="sm-sleep" type="range" min="0" max="100" value="70" oninput="document.getElementById('sm-val').textContent=this.value" style="flex:1">
+      <span id="sm-val" style="font-family:'Bebas Neue',sans-serif;font-size:36px;color:var(--accent);min-width:50px">70</span>
+    </div>
+  `, async ()=>{
+    const val = parseInt(document.getElementById('sm-sleep')?.value)||70;
+    localStorage.setItem('sleep_'+todayStr(), val);
+    await sb.from('body_logs').upsert({date:todayStr(),sleep_score:val},{onConflict:'date'});
+    showToast('Sleep score saved ✓');
+    closeModal();
+    if (activePanel==='today') renderToday();
+    if (activePanel==='body')  renderBody();
+  });
+}
+
+function openInjuryModal() {
+  openModal('Log Injury / Note', `
+    <div class="form-field"><div class="form-label">Body area</div><input class="form-input" id="inj-area" type="text" placeholder="Left hip, right knee…"></div>
+    <div class="form-field"><div class="form-label">Status</div>
+      <select class="form-select" id="inj-sev">
+        <option value="monitoring">Monitoring</option>
+        <option value="active">Active pain</option>
+        <option value="resolved">Resolved</option>
+      </select>
+    </div>
+    <div class="form-field"><div class="form-label">Notes</div><textarea class="form-input" id="inj-notes" placeholder="Describe the injury, when it appears, what makes it better or worse…"></textarea></div>
+  `, async ()=>{
+    const area = document.getElementById('inj-area')?.value||'';
+    const severity = document.getElementById('inj-sev')?.value||'monitoring';
+    const notes = document.getElementById('inj-notes')?.value||'';
+    if (!area) { showToast('Add a body area'); return; }
+    await sb.from('injuries').insert({date:todayStr(),area,severity,notes});
+    showToast('Injury logged ✓');
+    closeModal();
+    renderBody();
+  });
+}
+
+// ═══════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', ()=>{
+  updateHeader();
+  setInterval(updateHeader, 60000);
+  renderToday();
+});
+</script>
+</body>
+</html>
