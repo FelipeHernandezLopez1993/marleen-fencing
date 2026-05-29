@@ -9,8 +9,8 @@
 
 // ── Cloud database (this athlete's own Supabase project) ──
 const SUPABASE = {
-  url: 'https://dgipqrsuyezqscbwgbup.supabase.co',
-  key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRnaXBxcnN1eWV6cXNjYndnYnVwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk0NTA3MzYsImV4cCI6MjA5NTAyNjczNn0.fAYbu3yz5SOotJtvRxILGwk5h8iaGWj_a-cCFPa896Q',
+  url: 'https://wlhtyfzpofnnuhdoeyqx.supabase.co',
+  key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndsaHR5Znpwb2ZubnVoZG9leXF4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwNjgzMzQsImV4cCI6MjA5NTY0NDMzNH0.irKKebHBK7_JCUYydoDrV11LEBfWxmEf9pq63nwVVHs',
 };
 
 // ── Brand / theme ──
