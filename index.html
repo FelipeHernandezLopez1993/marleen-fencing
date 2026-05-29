@@ -230,6 +230,31 @@ textarea.form-input{resize:vertical;min-height:72px}
 .conn-name{font-size:13px;font-weight:500;color:var(--text)}
 .conn-status{font-size:11px;margin-top:1px}
 .progress-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:12px}
+
+/* Competition Guide */
+.comp-guide{border-radius:12px;padding:0;margin-bottom:14px;overflow:hidden;border:1px solid var(--border)}
+.comp-guide-header{padding:12px 14px 10px;display:flex;align-items:center;justify-content:space-between}
+.comp-guide-phase{font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:2px;padding:3px 8px;border-radius:100px;opacity:.9}
+.comp-guide-name{font-family:'Bebas Neue',sans-serif;font-size:19px;letter-spacing:1.5px;color:#fff}
+.comp-guide-sub{font-size:11px;color:var(--muted);margin-top:2px}
+.comp-guide-body{padding:0 14px 14px}
+.comp-now{margin-bottom:10px}
+.comp-now-item{display:flex;gap:8px;margin-bottom:7px;font-size:12px;line-height:1.5;color:var(--text)}
+.comp-now-dot{flex-shrink:0;width:6px;height:6px;border-radius:50%;margin-top:5px}
+.comp-section-head{display:flex;justify-content:space-between;align-items:center;cursor:pointer;padding:9px 0;border-top:1px solid var(--border)}
+.comp-section-title{font-size:11px;font-weight:500;color:var(--text);text-transform:uppercase;letter-spacing:.8px;display:flex;align-items:center;gap:6px}
+.comp-section-body{padding-bottom:4px}
+.comp-bullet{display:flex;gap:8px;margin-bottom:7px;font-size:12px;line-height:1.6;color:var(--muted)}
+.comp-bullet strong{color:var(--text)}
+.comp-bullet span{flex:1}
+.comp-bullet-dot{flex-shrink:0;margin-top:5px;font-size:8px}
+.focus-reset-box{background:var(--card2);border-radius:10px;padding:12px;margin-top:8px}
+.focus-step{display:flex;align-items:flex-start;gap:10px;margin-bottom:10px}
+.focus-step:last-child{margin-bottom:0}
+.focus-step-num{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:13px;flex-shrink:0;margin-top:1px}
+.focus-step-text{font-size:12px;line-height:1.5;color:var(--text)}
+.focus-step-sub{font-size:11px;color:var(--muted);margin-top:2px}
+.cue-word-display{font-family:'Bebas Neue',sans-serif;font-size:36px;letter-spacing:4px;text-align:center;padding:14px;background:rgba(61,155,233,.08);border:1px solid rgba(61,155,233,.2);border-radius:10px;color:var(--accent);margin:10px 0;cursor:pointer}
 </style>
 </head>
 <body>
@@ -545,164 +570,164 @@ const PLAN = [
     {am:{t:'rest',n:'Rest',d:'',dur:''},pm:null},
   ]},
   {ph:2,lbl:'W5',gym:3,sessions:6,fencing:4,days:[
-    {am:{t:'strength',n:'Power Lower A',d:'Trap bar DL 4×6 @45kg · Box jumps 3×5 · Leg press 3×10 @65kg · Hip thrust 3×10 @45kg · Nordic 3×8 · Calf 3×15',dur:'60m'},pm:{t:'fencing',n:'Fencing PM',d:'',dur:'90m'}},
+    {am:{t:'strength',n:'Power Lower A',d:'Trap bar DL 4×6 @50kg · Box jumps 3×5 · Leg press 3×10 @70kg · Hip thrust 3×10 @50kg · Nordic 3×8 · Calf 3×15',dur:'60m'},pm:{t:'fencing',n:'Fencing PM',d:'',dur:'90m'}},
     {am:{t:'fencing',n:'Fencing AM',d:'',dur:'90m'},pm:null},
-    {am:{t:'strength',n:'Athletic Upper A',d:'Pull-ups 4×5 @+0kg · DB rows 3×10 @15kg · Face pulls 3×15 · Wrist curls 3×15 · Farmer carry 3×30m @12kg/hand',dur:'60m'},pm:{t:'fencing',n:'Fencing PM',d:'',dur:'90m'}},
+    {am:{t:'strength',n:'Athletic Upper A',d:'Pull-ups 4×5 @+2.5kg · DB rows 3×10 @16kg · Face pulls 3×15 · Wrist curls 3×15 · Farmer carry 3×30m @13kg/hand',dur:'60m'},pm:{t:'fencing',n:'Fencing PM',d:'',dur:'90m'}},
     {am:{t:'fencing',n:'Fencing AM',d:'',dur:'90m'},pm:null},
-    {am:{t:'strength',n:'Total Body Athletic',d:'Goblet squat 3×10 @20kg · Med ball slams 3×10 · Pallof press 3×12 @18kg · Reverse lunge 3×8/side · Side plank 3×25s',dur:'55m'},pm:{t:'fencing',n:'Fencing PM',d:'',dur:'90m'}},
+    {am:{t:'strength',n:'Total Body Athletic',d:'Goblet squat 3×10 @22kg · Med ball slams 3×12 · Pallof press 3×12 @20kg · Reverse lunge 3×10/side @8kg · Side plank 3×30s',dur:'55m'},pm:{t:'fencing',n:'Fencing PM',d:'',dur:'90m'}},
     {am:{t:'yoga',n:'Yoga',d:'Saturday yoga',dur:'60m'},pm:{t:'run',n:'Easy Run',d:'~3 km Zone 2 · 20 min · warm up 5 min walk · check hip first',dur:'20m'}},
     {am:{t:'rest',n:'Rest',d:'',dur:''},pm:null},
   ]},
   {ph:2,lbl:'W6',gym:3,sessions:6,fencing:4,days:[
-    {am:{t:'strength',n:'Power Lower A',d:'Trap bar DL 4×6 @47.5kg · Box jumps 4×4 · Leg press 3×10 @70kg · Hip thrust 3×10 @50kg · Nordic 3×8 · Calf 3×15',dur:'60m'},pm:{t:'fencing',n:'Fencing PM',d:'',dur:'90m'}},
+    {am:{t:'strength',n:'Power Lower A',d:'Trap bar DL 4×6 @55kg · Box jumps 4×5 · Leg press 3×10 @77.5kg · Hip thrust 3×10 @57.5kg · Nordic 3×8 · Calf 3×15',dur:'60m'},pm:{t:'fencing',n:'Fencing PM',d:'',dur:'90m'}},
     {am:{t:'fencing',n:'Fencing AM',d:'',dur:'90m'},pm:null},
-    {am:{t:'strength',n:'Athletic Upper A',d:'Pull-ups 4×5 @+2.5kg · DB rows 3×10 @16kg · Face pulls 3×15 · Wrist curls 3×15 · Farmer carry 3×30m @13kg/hand',dur:'60m'},pm:{t:'fencing',n:'Fencing PM',d:'',dur:'90m'}},
+    {am:{t:'strength',n:'Athletic Upper A',d:'Pull-ups 4×5 @+5kg · DB rows 3×10 @17kg · Face pulls 3×15 · Wrist curls 3×15 · Farmer carry 3×30m @14kg/hand',dur:'60m'},pm:{t:'fencing',n:'Fencing PM',d:'',dur:'90m'}},
     {am:{t:'fencing',n:'Fencing AM',d:'',dur:'90m'},pm:null},
-    {am:{t:'strength',n:'Total Body Athletic',d:'Goblet squat 3×10 @22kg · Med ball slams 4×10 · Pallof press 3×12 @20kg · Reverse lunge 3×10/side · Side plank 3×30s',dur:'55m'},pm:{t:'fencing',n:'Fencing PM',d:'Last fencing before summer break 🏖️',dur:'90m'}},
+    {am:{t:'strength',n:'Total Body Athletic',d:'Goblet squat 3×10 @24kg · Med ball slams 4×12 · Pallof press 3×12 @22kg · Reverse lunge 3×10/side @10kg · Side plank 3×30s',dur:'55m'},pm:{t:'fencing',n:'Fencing PM',d:'Last fencing before summer break 🏖️',dur:'90m'}},
     {am:{t:'yoga',n:'Yoga',d:'',dur:'60m'},pm:{t:'run',n:'Run',d:'~4 km Zone 2 · 25 min',dur:'25m'}},
     {am:{t:'rest',n:'Rest',d:'Summer build starts next week — no fencing until September',dur:''},pm:null},
   ]},
   // ══ PHASE 3: SUMMER BUILD (W7-14) — NO FENCING ══
   {ph:3,lbl:'W7',gym:4,sessions:5,fencing:0,days:[
-    {am:{t:'strength',n:'Power Lower A',d:'Trap bar DL 4×5 @52.5kg · Box jumps 4×5 · Leg press 3×10 @75kg · Hip thrust 4×8 @55kg · Nordic 3×8 · Calf 4×15',dur:'65m'},pm:null},
-    {am:{t:'strength',n:'Athletic Upper A',d:'Pull-ups 4×5 @+5kg · DB rows 4×8 @16kg · Face pulls 3×15 · Wrist curls 4×15 · Farmer carry 3×30m @14kg/hand · Dead hang 3×20s',dur:'65m'},pm:null},
+    {am:{t:'strength',n:'Power Lower A',d:'Trap bar DL 4×5 @62.5kg · Box jumps 4×5 · Leg press 3×10 @87.5kg · Hip thrust 4×8 @67.5kg · Nordic 3×8 · Calf 4×15',dur:'65m'},pm:null},
+    {am:{t:'strength',n:'Athletic Upper A',d:'Pull-ups 4×5 @+10kg · DB rows 4×8 @18kg · Face pulls 3×15 · Wrist curls 4×15 · Farmer carry 3×30m @15kg/hand · Dead hang 3×25s',dur:'65m'},pm:null},
     {am:{t:'rest',n:'Active Recovery',d:'Light walk · foam roll · hip mobility circuit · stretch',dur:'30m'},pm:null},
-    {am:{t:'strength',n:'Total Body Athletic',d:'Goblet squat 4×8 @24kg · Med ball slams 4×10 · Pallof press 3×12 @22kg · Reverse lunge 4×8/side · Copenhagen plank 3×20s',dur:'65m'},pm:null},
-    {am:{t:'strength',n:'Athletic Upper B',d:'DB shoulder press 3×8 @12kg · DB bench 3×10 @12kg · Lat pulldown 3×10 @32kg · Rear delt flies 3×15 @6kg · Plate pinch 3×30s · Tricep 3×12',dur:'60m'},pm:null},
+    {am:{t:'strength',n:'Total Body Athletic',d:'Goblet squat 4×8 @28kg · Med ball slams 4×12 · Pallof press 3×12 @24kg · Reverse lunge 4×8/side @8kg · Copenhagen plank 3×25s · Finisher: 4 rounds — 10 KB swings @16kg + 5 box jumps, 45s rest',dur:'70m'},pm:null},
+    {am:{t:'strength',n:'Athletic Upper B',d:'DB shoulder press 4×8 @14kg · DB bench 3×10 @14kg · Lat pulldown 3×10 @37.5kg · Rear delt flies 3×15 @7kg · Plate pinch 3×35s · Tricep 3×12',dur:'60m'},pm:null},
     {am:{t:'yoga',n:'Yoga',d:'Summer full-body yoga',dur:'60m'},pm:{t:'run',n:'Run',d:'~4 km Zone 2 · 25 min · flat route',dur:'25m'}},
     {am:{t:'rest',n:'Rest',d:'',dur:''},pm:null},
   ]},
   {ph:3,lbl:'W8',gym:4,sessions:5,fencing:0,days:[
-    {am:{t:'strength',n:'Power Lower B',d:'Front squat 4×6 @32.5kg · Jump squats 3×8 @8kg · Single-leg press 3×10 @35kg · Hip thrust 4×8 @60kg · Copenhagen plank 3×20s · Calf 4×15',dur:'65m'},pm:null},
-    {am:{t:'strength',n:'Athletic Upper A',d:'Pull-ups 4×5 @+7.5kg · DB rows 4×8 @17kg · Face pulls 3×15 · Wrist curls 4×15 · Farmer carry 3×30m @15kg/hand',dur:'65m'},pm:null},
+    {am:{t:'strength',n:'Power Lower B',d:'Front squat 4×6 @40kg · Jump squats 4×8 @10kg · Single-leg press 3×10 @45kg · Hip thrust 4×8 @72.5kg · Copenhagen plank 3×25s · Calf 4×15',dur:'65m'},pm:null},
+    {am:{t:'strength',n:'Athletic Upper A',d:'Pull-ups 4×5 @+12.5kg · DB rows 4×8 @19kg · Face pulls 3×15 · Wrist curls 4×15 · Farmer carry 3×30m @16kg/hand',dur:'65m'},pm:null},
     {am:{t:'rest',n:'Active Recovery',d:'Hip mobility · foam roll · stretch',dur:'30m'},pm:null},
-    {am:{t:'strength',n:'Total Body Athletic',d:'Goblet squat 4×8 @26kg · Med ball slams 4×10 · Pallof press 3×12 @24kg · Reverse lunge 4×8/side @8kg · Copenhagen plank 3×25s',dur:'65m'},pm:null},
-    {am:{t:'strength',n:'Athletic Upper B',d:'DB shoulder press 3×8 @13kg · DB bench 3×10 @13kg · Lat pulldown 3×10 @35kg · Rear delt 3×15 · Plate pinch 3×35s · Tricep 3×12',dur:'60m'},pm:null},
+    {am:{t:'strength',n:'Total Body Athletic',d:'Goblet squat 4×8 @30kg · Med ball slams 4×12 · Pallof press 3×12 @26kg · Reverse lunge 4×8/side @10kg · Copenhagen plank 3×30s · Finisher: 4 rounds — 8 KB swings @20kg + 6 lateral bounds + 30s rest',dur:'70m'},pm:null},
+    {am:{t:'strength',n:'Athletic Upper B',d:'DB shoulder press 4×8 @15kg · DB bench 3×10 @15kg · Lat pulldown 3×10 @40kg · Rear delt 3×15 · Plate pinch 3×40s · Tricep 3×12',dur:'60m'},pm:null},
     {am:{t:'yoga',n:'Yoga',d:'',dur:'60m'},pm:{t:'run',n:'Run',d:'~5 km Zone 2 · 30 min',dur:'30m'}},
     {am:{t:'rest',n:'Rest',d:'',dur:''},pm:null},
   ]},
   {ph:3,lbl:'W9',gym:4,sessions:5,fencing:0,days:[
-    {am:{t:'strength',n:'Power Lower A',d:'Trap bar DL 4×5 @57.5kg · Box jumps 4×5 · Leg press 4×8 @80kg · Hip thrust 4×8 @65kg · Nordic 3×8 · Calf 4×15',dur:'65m'},pm:null},
-    {am:{t:'strength',n:'Athletic Upper A',d:'Pull-ups 4×5 @+10kg · DB rows 4×8 @18kg · Face pulls 3×15 · Wrist curls 4×15 · Farmer carry 4×30m @16kg/hand',dur:'65m'},pm:null},
+    {am:{t:'strength',n:'Power Lower A',d:'Trap bar DL 4×5 @70kg · Box jumps 4×5 · Leg press 4×8 @95kg · Hip thrust 4×8 @80kg · Nordic 3×8 · Calf 4×15',dur:'65m'},pm:null},
+    {am:{t:'strength',n:'Athletic Upper A',d:'Pull-ups 4×5 @+15kg · DB rows 4×8 @20kg · Face pulls 3×15 · Wrist curls 4×15 · Farmer carry 4×30m @18kg/hand',dur:'65m'},pm:null},
     {am:{t:'rest',n:'Active Recovery',d:'',dur:'30m'},pm:null},
-    {am:{t:'strength',n:'Total Body Athletic',d:'Goblet squat 4×8 @28kg · Med ball slams 4×12 · Pallof press 4×10 @26kg · Reverse lunge 4×8/side @10kg · Copenhagen plank 3×30s',dur:'65m'},pm:null},
-    {am:{t:'strength',n:'Athletic Upper B',d:'DB shoulder press 4×8 @14kg · DB bench 3×10 @14kg · Lat pulldown 3×10 @37.5kg · Rear delt 3×15 · Plate pinch 3×35s',dur:'60m'},pm:null},
+    {am:{t:'strength',n:'Total Body Athletic',d:'Goblet squat 4×8 @32kg · Med ball slams 4×12 · Pallof press 4×10 @28kg · Reverse lunge 4×8/side @12kg · Copenhagen plank 3×35s · Finisher: 5 rounds — 8 KB swings @20kg + 4 broad jumps, 45s rest',dur:'70m'},pm:null},
+    {am:{t:'strength',n:'Athletic Upper B',d:'DB shoulder press 4×8 @16kg · DB bench 3×10 @16kg · Lat pulldown 3×10 @42.5kg · Rear delt 3×15 · Plate pinch 3×40s',dur:'60m'},pm:null},
     {am:{t:'yoga',n:'Yoga',d:'',dur:'60m'},pm:{t:'run',n:'Run',d:'~5 km Zone 2 · 30 min · strong pace',dur:'30m'}},
     {am:{t:'rest',n:'Rest',d:'',dur:''},pm:null},
   ]},
   {ph:3,lbl:'W10',gym:4,sessions:5,fencing:0,days:[
-    {am:{t:'strength',n:'Power Lower B',d:'Front squat 4×5 @37.5kg · Jump squats 4×8 @10kg · Single-leg press 4×8 @42.5kg · Hip thrust 4×8 @70kg · Copenhagen plank 3×25s · Calf 4×15',dur:'65m'},pm:null},
-    {am:{t:'strength',n:'Athletic Upper A',d:'Pull-ups 4×5 @+12.5kg · DB rows 4×8 @19kg · Face pulls 3×15 · Wrist curls 4×15 · Farmer carry 4×30m @17kg/hand',dur:'65m'},pm:null},
+    {am:{t:'strength',n:'Power Lower B',d:'Front squat 4×5 @47.5kg · Jump squats 4×8 @12kg · Single-leg press 4×8 @55kg · Hip thrust 4×8 @85kg · Copenhagen plank 3×30s · Calf 4×15',dur:'65m'},pm:null},
+    {am:{t:'strength',n:'Athletic Upper A',d:'Pull-ups 4×5 @+17.5kg · DB rows 4×8 @21kg · Face pulls 3×15 · Wrist curls 4×15 · Farmer carry 4×30m @19kg/hand',dur:'65m'},pm:null},
     {am:{t:'rest',n:'Active Recovery',d:'Hip mobility · walk 30 min',dur:'30m'},pm:null},
-    {am:{t:'strength',n:'Total Body Athletic',d:'Goblet squat 4×6 @32kg · Med ball slams 4×12 · Pallof press 4×10 @28kg · Reverse lunge 4×8/side @12kg · Copenhagen plank 4×25s',dur:'65m'},pm:null},
-    {am:{t:'strength',n:'Athletic Upper B',d:'DB shoulder press 4×8 @15kg · DB bench 4×8 @15kg · Lat pulldown 4×8 @40kg · Rear delt 3×15 · Plate pinch 3×40s',dur:'60m'},pm:null},
+    {am:{t:'strength',n:'Total Body Athletic',d:'Goblet squat 4×6 @36kg · Med ball slams 4×15 · Pallof press 4×10 @30kg · Reverse lunge 4×8/side @14kg · Copenhagen plank 4×30s · Finisher: 5 rounds — 10 KB swings @22kg + 5 box jumps, 45s rest',dur:'70m'},pm:null},
+    {am:{t:'strength',n:'Athletic Upper B',d:'DB shoulder press 4×8 @18kg · DB bench 4×8 @17kg · Lat pulldown 4×8 @45kg · Rear delt 3×15 · Plate pinch 3×45s',dur:'60m'},pm:null},
     {am:{t:'yoga',n:'Yoga',d:'',dur:'60m'},pm:{t:'run',n:'Run',d:'~5.5 km Zone 2 · 35 min',dur:'35m'}},
     {am:{t:'rest',n:'Rest',d:'',dur:''},pm:null},
   ]},
   {ph:3,lbl:'W11',gym:3,sessions:4,fencing:0,days:[
-    {am:{t:'strength',n:'Power Lower A — Deload',d:'Trap bar DL 3×5 @47.5kg · Box jumps 2×5 · Leg press 3×8 @65kg · Hip thrust 3×8 @55kg · Calf 2×15 · Reduce all weights ~20% — deload week',dur:'50m'},pm:null},
+    {am:{t:'strength',n:'Power Lower A — Deload',d:'Trap bar DL 3×5 @55kg · Box jumps 2×5 · Leg press 3×8 @75kg · Hip thrust 3×8 @65kg · Calf 2×15 · Deload: weights ~20% below last week — let the body absorb',dur:'50m'},pm:null},
     {am:{t:'rest',n:'Active Recovery',d:'Walk · stretch · hip mobility · no gym',dur:'30m'},pm:null},
-    {am:{t:'strength',n:'Athletic Upper A — Deload',d:'Pull-ups 3×5 @+7.5kg · Rows 3×8 @15kg · Face pulls 2×15 · Light — deload',dur:'50m'},pm:null},
+    {am:{t:'strength',n:'Athletic Upper A — Deload',d:'Pull-ups 3×5 @+10kg · Rows 3×8 @16kg · Face pulls 2×15 · Light — deload',dur:'50m'},pm:null},
     {am:{t:'rest',n:'Rest',d:'',dur:''},pm:null},
-    {am:{t:'strength',n:'Total Body — Light',d:'Goblet squat 3×8 @22kg · Med ball slams 2×10 · Pallof press 2×10 · Easy session',dur:'45m'},pm:null},
+    {am:{t:'strength',n:'Total Body — Light',d:'Goblet squat 3×8 @26kg · Med ball slams 2×10 · Pallof press 2×10 · Easy session — consolidate, don\'t push',dur:'45m'},pm:null},
     {am:{t:'yoga',n:'Yoga',d:'',dur:'60m'},pm:{t:'run',n:'Easy Run',d:'~4 km Zone 2 · 25 min · deload week, keep it easy',dur:'25m'}},
     {am:{t:'rest',n:'Rest',d:'',dur:''},pm:null},
   ]},
   {ph:3,lbl:'W12',gym:4,sessions:5,fencing:0,days:[
-    {am:{t:'strength',n:'Power Lower A',d:'Trap bar DL 4×5 @60kg · Box jumps 4×5 · Leg press 4×8 @85kg · Hip thrust 4×8 @72.5kg · Nordic 3×8 · Calf 4×15',dur:'65m'},pm:null},
-    {am:{t:'strength',n:'Athletic Upper A',d:'Pull-ups 4×5 @+12.5kg · DB rows 4×8 @20kg · Face pulls 3×15 · Wrist curls 4×15 · Farmer carry 4×30m @18kg/hand',dur:'65m'},pm:null},
+    {am:{t:'strength',n:'Power Lower A',d:'Trap bar DL 4×5 @75kg · Box jumps 4×5 · Leg press 4×8 @100kg · Hip thrust 4×8 @87.5kg · Nordic 3×8 · Calf 4×15',dur:'65m'},pm:null},
+    {am:{t:'strength',n:'Athletic Upper A',d:'Pull-ups 4×5 @+17.5kg · DB rows 4×8 @22kg · Face pulls 3×15 · Wrist curls 4×15 · Farmer carry 4×30m @20kg/hand',dur:'65m'},pm:null},
     {am:{t:'rest',n:'Active Recovery',d:'',dur:'30m'},pm:null},
-    {am:{t:'strength',n:'Total Body Athletic',d:'Goblet squat 4×6 @34kg · Med ball slams 4×12 · Pallof press 4×10 @28kg · Reverse lunge 4×8/side @14kg · Copenhagen plank 4×30s',dur:'65m'},pm:null},
-    {am:{t:'strength',n:'Athletic Upper B',d:'DB shoulder press 4×8 @15kg · DB bench 4×8 @16kg · Lat pulldown 4×8 @42.5kg · Rear delt 3×15 · Plate pinch 3×40s',dur:'60m'},pm:null},
+    {am:{t:'strength',n:'Total Body Athletic',d:'Goblet squat 4×6 @38kg · Med ball slams 4×15 · Pallof press 4×10 @32kg · Reverse lunge 4×8/side @16kg · Copenhagen plank 4×35s · Finisher: 5 rounds — 10 KB swings @24kg + 5 box jumps + 5 push-ups, 45s rest',dur:'70m'},pm:null},
+    {am:{t:'strength',n:'Athletic Upper B',d:'DB shoulder press 4×8 @18kg · DB bench 4×8 @18kg · Lat pulldown 4×8 @47.5kg · Rear delt 3×15 · Plate pinch 3×45s',dur:'60m'},pm:null},
     {am:{t:'yoga',n:'Yoga',d:'',dur:'60m'},pm:{t:'run',n:'Run',d:'~5.5 km Zone 2 · 35 min',dur:'35m'}},
     {am:{t:'rest',n:'Rest',d:'',dur:''},pm:null},
   ]},
   {ph:3,lbl:'W13',gym:4,sessions:5,fencing:0,days:[
-    {am:{t:'strength',n:'Power Lower B',d:'Front squat 4×5 @42.5kg · Jump squats 4×8 @12kg · Single-leg press 4×8 @47.5kg · Hip thrust 4×6 @77.5kg · Copenhagen plank 4×25s · Calf 4×15',dur:'65m'},pm:null},
-    {am:{t:'strength',n:'Athletic Upper A',d:'Pull-ups 4×5 @+15kg · DB rows 4×8 @21kg · Face pulls 3×15 · Wrist curls 4×15 · Farmer carry 4×30m @19kg/hand',dur:'65m'},pm:null},
+    {am:{t:'strength',n:'Power Lower B',d:'Front squat 4×5 @52.5kg · Jump squats 4×8 @14kg · Single-leg press 4×8 @62.5kg · Hip thrust 4×6 @95kg · Copenhagen plank 4×30s · Calf 4×15',dur:'65m'},pm:null},
+    {am:{t:'strength',n:'Athletic Upper A',d:'Pull-ups 4×5 @+20kg · DB rows 4×8 @23kg · Face pulls 3×15 · Wrist curls 4×15 · Farmer carry 4×30m @21kg/hand',dur:'65m'},pm:null},
     {am:{t:'rest',n:'Active Recovery',d:'',dur:'30m'},pm:null},
-    {am:{t:'strength',n:'Total Body Athletic',d:'Goblet squat 4×6 @36kg · Med ball slams 4×15 · Pallof press 4×12 @30kg · Reverse lunge 4×6/side @16kg · Copenhagen plank 4×30s',dur:'65m'},pm:null},
-    {am:{t:'strength',n:'Athletic Upper B',d:'DB shoulder press 4×8 @16kg · DB bench 4×8 @17kg · Lat pulldown 4×8 @45kg · Rear delt 3×15 · Plate pinch 3×45s',dur:'60m'},pm:null},
+    {am:{t:'strength',n:'Total Body Athletic',d:'Goblet squat 4×6 @40kg · Med ball slams 4×15 · Pallof press 4×12 @34kg · Reverse lunge 4×8/side @18kg · Copenhagen plank 4×35s · Finisher: 6 rounds — 10 KB swings @24kg + 5 box jumps + 8 reverse lunges @8kg, 45s rest',dur:'70m'},pm:null},
+    {am:{t:'strength',n:'Athletic Upper B',d:'DB shoulder press 4×8 @20kg · DB bench 4×8 @19kg · Lat pulldown 4×8 @50kg · Rear delt 3×15 · Plate pinch 3×50s',dur:'60m'},pm:null},
     {am:{t:'yoga',n:'Yoga',d:'',dur:'60m'},pm:{t:'run',n:'Run',d:'~5.5 km Zone 2 · 35 min · strong and controlled',dur:'35m'}},
     {am:{t:'rest',n:'Rest',d:'Fencing returns in 2 weeks — summer build almost done 💪',dur:''},pm:null},
   ]},
   {ph:3,lbl:'W14',gym:3,sessions:4,fencing:0,days:[
-    {am:{t:'strength',n:'Power Lower A — Transition',d:'Trap bar DL 3×5 @55kg · Box jumps 3×5 · Leg press 3×8 @80kg · Hip thrust 3×8 @67.5kg · Calf 3×15 · Reduce volume — fencing returns next week',dur:'55m'},pm:null},
-    {am:{t:'strength',n:'Athletic Upper A — Transition',d:'Pull-ups 3×5 @+12.5kg · Rows 3×8 @19kg · Face pulls 3×15 · Wrist curls 3×15',dur:'55m'},pm:null},
+    {am:{t:'strength',n:'Power Lower A — Transition',d:'Trap bar DL 3×5 @70kg · Box jumps 3×5 · Leg press 3×8 @92.5kg · Hip thrust 3×8 @82.5kg · Calf 3×15 · Volume down — fencing returns next week, stay fresh',dur:'55m'},pm:null},
+    {am:{t:'strength',n:'Athletic Upper A — Transition',d:'Pull-ups 3×5 @+17.5kg · Rows 3×8 @21kg · Face pulls 3×15 · Wrist curls 3×15',dur:'55m'},pm:null},
     {am:{t:'rest',n:'Active Recovery',d:'',dur:'30m'},pm:null},
-    {am:{t:'strength',n:'Total Body Light',d:'Goblet squat 3×8 @30kg · Med ball slams 3×10 · Pallof press 3×10 · Easy session — preparing for full schedule',dur:'50m'},pm:null},
+    {am:{t:'strength',n:'Total Body Light',d:'Goblet squat 3×8 @36kg · Med ball slams 3×10 · Pallof press 3×10 · Easy session — preparing for full schedule',dur:'50m'},pm:null},
     {am:{t:'rest',n:'Rest',d:'',dur:''},pm:null},
     {am:{t:'yoga',n:'Yoga',d:'',dur:'60m'},pm:{t:'run',n:'Easy Run',d:'~5 km Zone 2 · 30 min · last solo run of summer',dur:'30m'}},
     {am:{t:'rest',n:'Rest',d:'Fencing returns next week — you are stronger than when you left the piste 🔥',dur:''},pm:null},
   ]},
   // ══ PHASE 4: COMPETITION SEASON (W15-22) — FENCING RETURNS ══
   {ph:4,lbl:'W15',gym:3,sessions:7,fencing:4,days:[
-    {am:{t:'strength',n:'Power Lower A',d:'Trap bar DL 4×5 @57.5kg · Box jumps 3×5 · Leg press 3×10 @82.5kg · Hip thrust 4×8 @70kg · Nordic 3×8 · Calf 4×15',dur:'60m'},pm:{t:'fencing',n:'Fencing PM',d:'Fencing returns — welcome back to the piste',dur:'90m'}},
+    {am:{t:'strength',n:'Power Lower A',d:'Trap bar DL 4×5 @67.5kg · Box jumps 3×5 · Leg press 3×10 @92.5kg · Hip thrust 4×8 @82.5kg · Nordic 3×8 · Calf 4×15',dur:'60m'},pm:{t:'fencing',n:'Fencing PM',d:'Fencing returns — welcome back to the piste',dur:'90m'}},
     {am:{t:'fencing',n:'Fencing AM',d:'First morning session after summer',dur:'90m'},pm:null},
-    {am:{t:'strength',n:'Athletic Upper A',d:'Pull-ups 4×5 @+15kg · DB rows 3×8 @20kg · Face pulls 3×15 · Wrist curls 4×15 · Farmer carry 3×30m @19kg/hand',dur:'60m'},pm:{t:'fencing',n:'Fencing PM',d:'',dur:'90m'}},
+    {am:{t:'strength',n:'Athletic Upper A',d:'Pull-ups 4×5 @+18kg · DB rows 3×8 @22kg · Face pulls 3×15 · Wrist curls 4×15 · Farmer carry 3×30m @21kg/hand',dur:'60m'},pm:{t:'fencing',n:'Fencing PM',d:'',dur:'90m'}},
     {am:{t:'fencing',n:'Fencing AM',d:'',dur:'90m'},pm:null},
-    {am:{t:'strength',n:'Total Body Athletic',d:'Goblet squat 3×8 @32kg · Med ball slams 3×12 · Pallof press 3×12 @28kg · Reverse lunge 3×8/side @14kg · Side plank 3×35s',dur:'55m'},pm:{t:'fencing',n:'Fencing PM',d:'',dur:'90m'}},
+    {am:{t:'strength',n:'Total Body Athletic',d:'Goblet squat 3×8 @38kg · Med ball slams 3×12 · Pallof press 3×12 @32kg · Reverse lunge 3×8/side @16kg · Side plank 3×40s',dur:'55m'},pm:{t:'fencing',n:'Fencing PM',d:'',dur:'90m'}},
     {am:{t:'yoga',n:'Yoga',d:'',dur:'60m'},pm:null},
     {am:{t:'rest',n:'Rest',d:'',dur:''},pm:null},
   ]},
   {ph:4,lbl:'W16',gym:3,sessions:7,fencing:4,days:[
-    {am:{t:'strength',n:'Power Lower A',d:'Trap bar DL 4×5 @60kg · Box jumps 4×5 · Leg press 4×8 @87.5kg · Hip thrust 4×8 @72.5kg · Nordic 3×8 · Calf 4×15',dur:'60m'},pm:{t:'fencing',n:'Fencing PM',d:'',dur:'90m'}},
+    {am:{t:'strength',n:'Power Lower A',d:'Trap bar DL 4×5 @72.5kg · Box jumps 4×5 · Leg press 4×8 @97.5kg · Hip thrust 4×8 @87.5kg · Nordic 3×8 · Calf 4×15',dur:'60m'},pm:{t:'fencing',n:'Fencing PM',d:'',dur:'90m'}},
     {am:{t:'fencing',n:'Fencing AM',d:'',dur:'90m'},pm:null},
-    {am:{t:'strength',n:'Athletic Upper A',d:'Pull-ups 4×5 @+17.5kg · DB rows 4×8 @21kg · Face pulls 3×15 · Wrist curls 4×15 · Farmer carry 4×30m @20kg/hand',dur:'60m'},pm:{t:'fencing',n:'Fencing PM',d:'',dur:'90m'}},
+    {am:{t:'strength',n:'Athletic Upper A',d:'Pull-ups 4×5 @+20kg · DB rows 4×8 @23kg · Face pulls 3×15 · Wrist curls 4×15 · Farmer carry 4×30m @22kg/hand',dur:'60m'},pm:{t:'fencing',n:'Fencing PM',d:'',dur:'90m'}},
     {am:{t:'fencing',n:'Fencing AM',d:'',dur:'90m'},pm:null},
-    {am:{t:'strength',n:'Athletic Upper B',d:'DB shoulder press 3×8 @15kg · DB bench 3×8 @17kg · Lat pulldown 3×10 @42.5kg · Rear delt 3×15 · Plate pinch 3×40s',dur:'55m'},pm:{t:'fencing',n:'Fencing PM',d:'',dur:'90m'}},
+    {am:{t:'strength',n:'Athletic Upper B',d:'DB shoulder press 3×8 @18kg · DB bench 3×8 @19kg · Lat pulldown 3×10 @50kg · Rear delt 3×15 · Plate pinch 3×45s',dur:'55m'},pm:{t:'fencing',n:'Fencing PM',d:'',dur:'90m'}},
     {am:{t:'yoga',n:'Yoga',d:'',dur:'60m'},pm:{t:'run',n:'Easy Run',d:'~4 km Zone 2 · 25 min · easy',dur:'25m'}},
     {am:{t:'rest',n:'Rest',d:'',dur:''},pm:null},
   ]},
   {ph:4,lbl:'W17',gym:3,sessions:7,fencing:4,days:[
-    {am:{t:'strength',n:'Power Lower B',d:'Front squat 3×5 @45kg · Jump squats 3×8 @12kg · Single-leg press 3×8 @50kg · Hip thrust 4×8 @75kg · Copenhagen plank 3×30s · Calf 3×15',dur:'60m'},pm:{t:'fencing',n:'Fencing PM',d:'',dur:'90m'}},
+    {am:{t:'strength',n:'Power Lower B',d:'Front squat 3×5 @52.5kg · Jump squats 3×8 @14kg · Single-leg press 3×8 @60kg · Hip thrust 4×8 @90kg · Copenhagen plank 3×35s · Calf 3×15',dur:'60m'},pm:{t:'fencing',n:'Fencing PM',d:'',dur:'90m'}},
     {am:{t:'fencing',n:'Fencing AM',d:'',dur:'90m'},pm:null},
-    {am:{t:'strength',n:'Athletic Upper A',d:'Pull-ups 3×5 @+17.5kg · DB rows 3×8 @21kg · Face pulls 3×15 · Wrist curls 3×15 · Farmer carry 3×30m @20kg/hand',dur:'60m'},pm:{t:'fencing',n:'Fencing PM',d:'',dur:'90m'}},
+    {am:{t:'strength',n:'Athletic Upper A',d:'Pull-ups 3×5 @+20kg · DB rows 3×8 @23kg · Face pulls 3×15 · Wrist curls 3×15 · Farmer carry 3×30m @22kg/hand',dur:'60m'},pm:{t:'fencing',n:'Fencing PM',d:'',dur:'90m'}},
     {am:{t:'fencing',n:'Fencing AM',d:'',dur:'90m'},pm:null},
-    {am:{t:'strength',n:'Total Body Athletic',d:'Goblet squat 3×8 @34kg · Med ball slams 3×12 · Pallof press 3×12 @30kg · Reverse lunge 3×8/side @16kg · Side plank 3×35s',dur:'55m'},pm:{t:'fencing',n:'Fencing PM',d:'',dur:'90m'}},
+    {am:{t:'strength',n:'Total Body Athletic',d:'Goblet squat 3×8 @40kg · Med ball slams 3×12 · Pallof press 3×12 @34kg · Reverse lunge 3×8/side @18kg · Side plank 3×40s',dur:'55m'},pm:{t:'fencing',n:'Fencing PM',d:'',dur:'90m'}},
     {am:{t:'yoga',n:'Yoga',d:'',dur:'60m'},pm:{t:'run',n:'Run',d:'~4 km Zone 2 · 25 min',dur:'25m'}},
     {am:{t:'rest',n:'Rest',d:'',dur:''},pm:null},
   ]},
   {ph:4,lbl:'W18',gym:3,sessions:7,fencing:4,days:[
-    {am:{t:'strength',n:'Power Lower A',d:'Trap bar DL 3×5 @62.5kg · Box jumps 3×5 · Leg press 3×10 @90kg · Hip thrust 3×8 @77.5kg · Nordic 3×8 · Calf 3×15',dur:'60m'},pm:{t:'fencing',n:'Fencing PM',d:'',dur:'90m'}},
+    {am:{t:'strength',n:'Power Lower A',d:'Trap bar DL 3×5 @75kg · Box jumps 3×5 · Leg press 3×10 @100kg · Hip thrust 3×8 @92.5kg · Nordic 3×8 · Calf 3×15',dur:'60m'},pm:{t:'fencing',n:'Fencing PM',d:'',dur:'90m'}},
     {am:{t:'fencing',n:'Fencing AM',d:'',dur:'90m'},pm:null},
-    {am:{t:'strength',n:'Athletic Upper B',d:'DB shoulder press 3×8 @16kg · DB bench 3×8 @18kg · Lat pulldown 3×10 @45kg · Rear delt 3×15 · Plate pinch 3×45s',dur:'55m'},pm:{t:'fencing',n:'Fencing PM',d:'',dur:'90m'}},
+    {am:{t:'strength',n:'Athletic Upper B',d:'DB shoulder press 3×8 @20kg · DB bench 3×8 @20kg · Lat pulldown 3×10 @52.5kg · Rear delt 3×15 · Plate pinch 3×50s',dur:'55m'},pm:{t:'fencing',n:'Fencing PM',d:'',dur:'90m'}},
     {am:{t:'fencing',n:'Fencing AM',d:'',dur:'90m'},pm:null},
-    {am:{t:'strength',n:'Athletic Upper A',d:'Pull-ups 3×5 @+17.5kg · Rows 3×8 @21kg · Face pulls 3×15 · Wrist curls 3×15 · Farmer carry 3×30m @20kg/hand',dur:'55m'},pm:{t:'fencing',n:'Fencing PM',d:'',dur:'90m'}},
+    {am:{t:'strength',n:'Athletic Upper A',d:'Pull-ups 3×5 @+20kg · Rows 3×8 @23kg · Face pulls 3×15 · Wrist curls 3×15 · Farmer carry 3×30m @22kg/hand',dur:'55m'},pm:{t:'fencing',n:'Fencing PM',d:'',dur:'90m'}},
     {am:{t:'yoga',n:'Yoga',d:'',dur:'60m'},pm:null},
     {am:{t:'rest',n:'Rest',d:'',dur:''},pm:null},
   ]},
   {ph:4,lbl:'W19',gym:2,sessions:4,fencing:3,days:[
-    {am:{t:'strength',n:'Power Lower A — Deload',d:'Trap bar DL 3×5 @50kg · Box jumps 2×5 · Leg press 2×10 @70kg · Hip thrust 2×8 @60kg · Reduce 20% — deload week',dur:'45m'},pm:{t:'fencing',n:'Fencing PM',d:'',dur:'90m'}},
+    {am:{t:'strength',n:'Power Lower A — Deload',d:'Trap bar DL 3×5 @60kg · Box jumps 2×5 · Leg press 2×10 @80kg · Hip thrust 2×8 @72.5kg · Reduce 20% — deload week',dur:'45m'},pm:{t:'fencing',n:'Fencing PM',d:'',dur:'90m'}},
     {am:{t:'fencing',n:'Fencing AM',d:'',dur:'90m'},pm:null},
-    {am:{t:'strength',n:'Athletic Upper A — Deload',d:'Pull-ups 2×5 @+12.5kg · Rows 2×8 @17kg · Face pulls 2×15 · Light',dur:'40m'},pm:{t:'fencing',n:'Fencing PM',d:'',dur:'90m'}},
+    {am:{t:'strength',n:'Athletic Upper A — Deload',d:'Pull-ups 2×5 @+15kg · Rows 2×8 @19kg · Face pulls 2×15 · Light',dur:'40m'},pm:{t:'fencing',n:'Fencing PM',d:'',dur:'90m'}},
     {am:{t:'fencing',n:'Fencing AM',d:'',dur:'90m'},pm:null},
     {am:{t:'rest',n:'Rest',d:'Full rest · stretch · recover',dur:''},pm:null},
     {am:{t:'yoga',n:'Yoga',d:'',dur:'60m'},pm:null},
     {am:{t:'rest',n:'Rest',d:'',dur:''},pm:null},
   ]},
   {ph:4,lbl:'W20',gym:3,sessions:7,fencing:4,days:[
-    {am:{t:'strength',n:'Power Lower A',d:'Trap bar DL 3×5 @60kg · Box jumps 3×5 · Leg press 3×10 @87.5kg · Hip thrust 3×8 @75kg · Nordic 3×8 · Calf 3×15',dur:'60m'},pm:{t:'fencing',n:'Fencing PM',d:'',dur:'90m'}},
+    {am:{t:'strength',n:'Power Lower A',d:'Trap bar DL 3×5 @75kg · Box jumps 3×5 · Leg press 3×10 @100kg · Hip thrust 3×8 @90kg · Nordic 3×8 · Calf 3×15',dur:'60m'},pm:{t:'fencing',n:'Fencing PM',d:'',dur:'90m'}},
     {am:{t:'fencing',n:'Fencing AM',d:'',dur:'90m'},pm:null},
-    {am:{t:'strength',n:'Athletic Upper A',d:'Pull-ups 3×5 @+17.5kg · Rows 3×8 @21kg · Face pulls 3×15 · Wrist curls 3×15 · Farmer carry 3×30m @20kg/hand',dur:'60m'},pm:{t:'fencing',n:'Fencing PM',d:'',dur:'90m'}},
+    {am:{t:'strength',n:'Athletic Upper A',d:'Pull-ups 3×5 @+20kg · Rows 3×8 @23kg · Face pulls 3×15 · Wrist curls 3×15 · Farmer carry 3×30m @22kg/hand',dur:'60m'},pm:{t:'fencing',n:'Fencing PM',d:'',dur:'90m'}},
     {am:{t:'fencing',n:'Fencing AM',d:'',dur:'90m'},pm:null},
-    {am:{t:'strength',n:'Total Body Athletic',d:'Goblet squat 3×8 @34kg · Med ball slams 3×12 · Pallof press 3×12 · Reverse lunge 3×8/side @16kg · Side plank 3×35s',dur:'55m'},pm:{t:'fencing',n:'Fencing PM',d:'',dur:'90m'}},
+    {am:{t:'strength',n:'Total Body Athletic',d:'Goblet squat 3×8 @40kg · Med ball slams 3×12 · Pallof press 3×12 @34kg · Reverse lunge 3×8/side @18kg · Side plank 3×40s',dur:'55m'},pm:{t:'fencing',n:'Fencing PM',d:'',dur:'90m'}},
     {am:{t:'yoga',n:'Yoga',d:'',dur:'60m'},pm:{t:'run',n:'Run',d:'~4 km Zone 2 · 25 min',dur:'25m'}},
     {am:{t:'rest',n:'Rest',d:'',dur:''},pm:null},
   ]},
   {ph:4,lbl:'W21',gym:3,sessions:7,fencing:4,days:[
-    {am:{t:'strength',n:'Power Lower B',d:'Front squat 3×5 @45kg · Jump squats 3×8 @12kg · Single-leg press 3×8 @50kg · Hip thrust 3×8 @75kg · Copenhagen plank 3×30s · Calf 3×15',dur:'60m'},pm:{t:'fencing',n:'Fencing PM',d:'',dur:'90m'}},
+    {am:{t:'strength',n:'Power Lower B',d:'Front squat 3×5 @55kg · Jump squats 3×8 @14kg · Single-leg press 3×8 @62.5kg · Hip thrust 3×8 @92.5kg · Copenhagen plank 3×35s · Calf 3×15',dur:'60m'},pm:{t:'fencing',n:'Fencing PM',d:'',dur:'90m'}},
     {am:{t:'fencing',n:'Fencing AM',d:'',dur:'90m'},pm:null},
-    {am:{t:'strength',n:'Athletic Upper B',d:'DB shoulder press 3×8 @16kg · DB bench 3×8 @18kg · Lat pulldown 3×10 @45kg · Rear delt 3×15 · Plate pinch 3×45s',dur:'55m'},pm:{t:'fencing',n:'Fencing PM',d:'',dur:'90m'}},
+    {am:{t:'strength',n:'Athletic Upper B',d:'DB shoulder press 3×8 @20kg · DB bench 3×8 @20kg · Lat pulldown 3×10 @52.5kg · Rear delt 3×15 · Plate pinch 3×50s',dur:'55m'},pm:{t:'fencing',n:'Fencing PM',d:'',dur:'90m'}},
     {am:{t:'fencing',n:'Fencing AM',d:'',dur:'90m'},pm:null},
-    {am:{t:'strength',n:'Athletic Upper A',d:'Pull-ups 3×5 @+17.5kg · Rows 3×8 @21kg · Face pulls 3×15 · Wrist curls 3×15 · Farmer carry 3×30m @20kg/hand',dur:'55m'},pm:{t:'fencing',n:'Fencing PM',d:'',dur:'90m'}},
+    {am:{t:'strength',n:'Athletic Upper A',d:'Pull-ups 3×5 @+20kg · Rows 3×8 @23kg · Face pulls 3×15 · Wrist curls 3×15 · Farmer carry 3×30m @22kg/hand',dur:'55m'},pm:{t:'fencing',n:'Fencing PM',d:'',dur:'90m'}},
     {am:{t:'yoga',n:'Yoga',d:'',dur:'60m'},pm:null},
     {am:{t:'rest',n:'Rest',d:'',dur:''},pm:null},
   ]},
   {ph:4,lbl:'W22',gym:2,sessions:5,fencing:4,days:[
-    {am:{t:'strength',n:'Power Lower A — Final Week',d:'Trap bar DL 3×5 @60kg · Box jumps 3×5 · Leg press 3×8 @85kg · Hip thrust 3×8 @72.5kg · Calf 3×15 · Last heavy lower session',dur:'55m'},pm:{t:'fencing',n:'Fencing PM',d:'',dur:'90m'}},
+    {am:{t:'strength',n:'Power Lower A — Final Week',d:'Trap bar DL 3×5 @72.5kg · Box jumps 3×5 · Leg press 3×8 @97.5kg · Hip thrust 3×8 @90kg · Calf 3×15 · Last heavy lower session — you came a long way from Week 1',dur:'55m'},pm:{t:'fencing',n:'Fencing PM',d:'',dur:'90m'}},
     {am:{t:'fencing',n:'Fencing AM',d:'',dur:'90m'},pm:null},
-    {am:{t:'strength',n:'Athletic Upper A — Final Week',d:'Pull-ups 3×5 @+15kg · Rows 3×8 @19kg · Face pulls 3×15 · Wrist curls 3×15 · Last upper session of the program',dur:'55m'},pm:{t:'fencing',n:'Fencing PM',d:'',dur:'90m'}},
+    {am:{t:'strength',n:'Athletic Upper A — Final Week',d:'Pull-ups 3×5 @+20kg · Rows 3×8 @23kg · Face pulls 3×15 · Wrist curls 3×15 · Last upper session of the program',dur:'55m'},pm:{t:'fencing',n:'Fencing PM',d:'',dur:'90m'}},
     {am:{t:'fencing',n:'Fencing AM',d:'',dur:'90m'},pm:null},
     {am:{t:'rest',n:'Rest',d:'22 weeks of work. You are not the same athlete who started this program.',dur:''},pm:{t:'fencing',n:'Fencing PM',d:'',dur:'90m'}},
     {am:{t:'yoga',n:'Yoga',d:'End of program yoga · reflect · be proud',dur:'60m'},pm:null},
@@ -1367,6 +1392,7 @@ async function renderToday() {
   el.innerHTML = `
     ${buildQuoteBar()}
     ${buildProgressCard(info)}
+    ${buildCompGuide()}
     ${buildCompetitionCountdown()}
     <div class="condition-card ${cond.level}">
       <div class="condition-status">${cond.label}</div>
@@ -2281,35 +2307,272 @@ function openInjuryModal() {
 }
 
 // ═══════════════════════════════════════════
-//  PUSH NOTIFICATIONS
+//  COMPETITION GUIDE
 // ═══════════════════════════════════════════
-async function initNotifications() {
-  if (!('serviceWorker' in navigator) || !('Notification' in window)) return;
-  try {
-    if (Notification.permission === 'default') await Notification.requestPermission();
-    if (Notification.permission !== 'granted') return;
-    // If you have a sw.js, it will be registered here
-    // For now, use basic local scheduling as fallback
-    scheduleLocalReminder();
-  } catch(e) { console.warn('[Notifications]', e); }
+function getCueWord() { return localStorage.getItem('cue_word') || 'HERE'; }
+function saveCueWord() {
+  const w = document.getElementById('cue-word-input')?.value?.trim().toUpperCase();
+  if (!w) return;
+  localStorage.setItem('cue_word', w);
+  showToast('Cue word saved: ' + w);
+  renderToday();
+}
+function toggleCompSection(id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const open = el.style.display !== 'none';
+  el.style.display = open ? 'none' : 'block';
+  const chevron = document.querySelector(`[data-chevron="${id}"]`);
+  if (chevron) chevron.textContent = open ? '▸' : '▾';
 }
 
-function scheduleLocalReminder() {
-  const now = new Date();
-  const morning = new Date(now);
-  morning.setHours(8, 0, 0, 0);
-  if (morning <= now) morning.setDate(morning.getDate() + 1);
-  const ms = morning - now;
-  setTimeout(() => {
-    if (Notification.permission === 'granted') {
-      new Notification('Marleen — Good morning ⚔️', {
-        body: 'Time to check today\'s sessions and log your metrics.',
-        icon: './apple-touch-icon.png',
-      });
+function getCompPhase() {
+  const dates = getCompDates();
+  const today = todayStr();
+  const comps = [
+    {name:'Nationals', emoji:'🥇', date:dates.nationals},
+    {name:'Europeans', emoji:'🏆', date:dates.europeans},
+  ];
+  for (const comp of comps) {
+    if (!comp.date) continue;
+    const diff = Math.round((new Date(comp.date+'T12:00:00') - new Date(today+'T12:00:00')) / 86400000);
+    if (diff >= -1 && diff <= 3) {
+      const phase = diff===0?'race':diff===-1?'recovery':diff===1?'eve':diff===2?'travel':'prep';
+      return {phase, comp, diff};
     }
-    scheduleLocalReminder(); // re-schedule for next day
-  }, ms);
+  }
+  return null;
 }
+
+function buildCompGuide() {
+  const ctx = getCompPhase();
+  if (!ctx) return '';
+
+  const {phase, comp} = ctx;
+  const cue = getCueWord();
+
+  const phaseLabels = {prep:'T−3 · Preparation', travel:'T−2 · Travel Day', eve:'T−1 · Competition Eve', race:'Competition Day', recovery:'Day After'};
+  const phaseColors = {prep:'#E8834B', travel:'#E8B84B', eve:'#E8834B', race:'#E85454', recovery:'#4CAF82'};
+  const phaseEmoji  = {prep:'📦', travel:'✈️', eve:'🌙', race:'⚔️', recovery:'🌱'};
+  const col = phaseColors[phase];
+
+  // ── per-phase top 3 "right now" items ──
+  const nowItems = {
+    prep:[
+      'Increase carbs by 20–30% today and tomorrow. Pasta, rice, oats. Familiar foods only.',
+      'Pack your competition bag tonight — not the night before. Supplements, kit, food for travel.',
+      'Begin visualization tonight: 5 min, eyes closed. One full bout. You are sharp, fast, in control.',
+    ],
+    travel:[
+      'You packed food for the road: rice cakes, banana, nut butter, dates, protein bar, 1L water.',
+      'Hydrate 500ml more than usual. Travel dehydrates you silently — dry air, stress, movement.',
+      'Hotel tonight: magnesium before bed, room cool, eye mask, charge phone across the room.',
+    ],
+    eve:[
+      'Big carb dinner by 7pm — pasta or rice, recipe you know. Nothing new. Nothing heavy.',
+      'Drink 500ml extra water today. Urine should be light yellow by evening.',
+      'Screens off by 9:30pm. Magnesium. Box breathing to sleep. Your preparation is complete.',
+    ],
+    race:[
+      'Eat 2–3 hours before first bout. Coffee 45–60 min before, not immediately on waking.',
+      'Warm-up 30 min before: footwork, shadow fencing, light sweat. 5 box breaths before the mask.',
+      'Snack every 2 hours all day. The energy for the final is built during the pools.',
+    ],
+    recovery:[
+      'Recovery meal within the hour if you haven\'t eaten: protein + carbs. Eat even if not hungry.',
+      'Easy movement only today — walk, gentle yoga. Zero gym. Your body needs integration time.',
+      'Debrief tonight: 3 questions. What am I proud of? What would I change? What did I learn?',
+    ],
+  };
+
+  // ── Section content ──
+  const sections = {
+    prep:{
+      nutrition:{emoji:'🍽',title:'Nutrition',body:`
+        <div class="comp-bullet"><span class="comp-bullet-dot" style="color:${col}">◆</span><span><strong>Target today:</strong> 2800–3000 kcal. Same as a double training day. Your muscles store glycogen now.</span></div>
+        <div class="comp-bullet"><span class="comp-bullet-dot" style="color:${col}">◆</span><span><strong>Focus on carbs:</strong> pasta, rice, sweet potato, oats, bread. Keep protein at 130g. Reduce fat slightly — it slows absorption.</span></div>
+        <div class="comp-bullet"><span class="comp-bullet-dot" style="color:${col}">◆</span><span><strong>Zero new foods.</strong> No new restaurants. No experiments. Your gut does not need surprises this week.</span></div>
+        <div class="comp-bullet"><span class="comp-bullet-dot" style="color:${col}">◆</span><span><strong>Supplements:</strong> all normal. Creatine has been loading for weeks — it is working in your muscles right now.</span></div>`},
+      sleep:{emoji:'😴',title:'Sleep',body:`
+        <div class="comp-bullet"><span class="comp-bullet-dot" style="color:${col}">◆</span><span>Start wind-down 30 min earlier tonight. Sleep compounds — tonight's rest counts toward competition day.</span></div>
+        <div class="comp-bullet"><span class="comp-bullet-dot" style="color:${col}">◆</span><span>Screens off by 10pm. The blue light delays melatonin by 1–2 hours.</span></div>
+        <div class="comp-bullet"><span class="comp-bullet-dot" style="color:${col}">◆</span><span>Magnesium tonight — it works better when taken consistently over multiple nights. Don't skip.</span></div>
+        <div class="comp-bullet"><span class="comp-bullet-dot" style="color:${col}">◆</span><span>Aim for 8+ hours. This is the easy sleep — use it. Competition eve is often broken.</span></div>`},
+      mindset:{emoji:'🧠',title:'Mindset',body:`
+        <div class="comp-bullet"><span class="comp-bullet-dot" style="color:${col}">◆</span><span><strong>Your preparation is essentially done.</strong> The training has already happened. This week is just delivery.</span></div>
+        <div class="comp-bullet"><span class="comp-bullet-dot" style="color:${col}">◆</span><span><strong>Visualization tonight:</strong> 5 min, eyes closed, relaxed. Imagine one complete bout from first touch to last. You move well. You are sharp. You trust your decisions.</span></div>
+        <div class="comp-bullet"><span class="comp-bullet-dot" style="color:${col}">◆</span><span>Light training only. Save the energy. No heavy gym. The last thing you need is DOMS on competition day.</span></div>
+        <div class="comp-bullet"><span class="comp-bullet-dot" style="color:${col}">◆</span><span>Don't think about results. Think about the actions that produce results. The score follows the fencing.</span></div>`},
+      focus:{emoji:'🎯',title:'Focus',body:`
+        <div class="comp-bullet"><span class="comp-bullet-dot" style="color:${col}">◆</span><span>Tonight, review your cue word. This is the word you'll say internally to snap back to the present during a bout.</span></div>
+        <div class="cue-word-display" onclick="document.getElementById('cue-edit').style.display='flex'">${cue}</div>
+        <div id="cue-edit" style="display:none;gap:8px;margin-top:8px">
+          <input id="cue-word-input" class="form-input" type="text" maxlength="8" placeholder="Your word" style="text-transform:uppercase;font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px" value="${cue}">
+          <button class="btn-primary" style="white-space:nowrap;padding:10px 14px" onclick="saveCueWord()">Save</button>
+        </div>
+        <div class="comp-bullet" style="margin-top:8px"><span class="comp-bullet-dot" style="color:${col}">◆</span><span>Good cue words: <strong>HERE · SHARP · NOW · ATTACK · FOCUS</strong>. One word. Short. Yours.</span></div>
+        <div class="comp-bullet"><span class="comp-bullet-dot" style="color:${col}">◆</span><span>When your mind drifts mid-bout — exhale, reset stance, say the word. Back in the present in 3 seconds.</span></div>`},
+    },
+    travel:{
+      nutrition:{emoji:'🍽',title:'Nutrition on the Road',body:`
+        <div class="comp-bullet"><span class="comp-bullet-dot" style="color:${col}">◆</span><span><strong>Pack your bag before leaving:</strong> rice cakes, banana, nut butter packet, dates or dried mango, protein bar, 1L water bottle.</span></div>
+        <div class="comp-bullet"><span class="comp-bullet-dot" style="color:${col}">◆</span><span><strong>If you must buy food:</strong> sushi, a sandwich, a bowl are all fine. Avoid: fried, fast food, gas station food, anything heavy.</span></div>
+        <div class="comp-bullet"><span class="comp-bullet-dot" style="color:${col}">◆</span><span><strong>Hydrate 500ml extra.</strong> Plane and train air is dry. Stress dehydrates. Urine should be pale yellow.</span></div>
+        <div class="comp-bullet"><span class="comp-bullet-dot" style="color:${col}">◆</span><span>One treat is fine. Don't obsess over perfect eating — that stress is worse than the food. Just avoid heavy fat and anything new.</span></div>`},
+      sleep:{emoji:'😴',title:'Sleep Away From Home',body:`
+        <div class="comp-bullet"><span class="comp-bullet-dot" style="color:${col}">◆</span><span><strong>Pack in your bag:</strong> eye mask, ear plugs, your own pillow case. The pillow case smells like home — it genuinely helps the brain relax in an unfamiliar room.</span></div>
+        <div class="comp-bullet"><span class="comp-bullet-dot" style="color:${col}">◆</span><span><strong>Room temperature:</strong> 18°C is optimal for sleep. Open the window or set the AC. A cool room = deeper sleep.</span></div>
+        <div class="comp-bullet"><span class="comp-bullet-dot" style="color:${col}">◆</span><span><strong>White noise:</strong> turn on a fan, or use a white noise app. The brain ignores familiar sounds, but unfamiliar hotel sounds can wake you. White noise masks them all.</span></div>
+        <div class="comp-bullet"><span class="comp-bullet-dot" style="color:${col}">◆</span><span><strong>Phone across the room.</strong> Charge it away from the bed. No scrolling in bed — it delays sleep by 45+ min.</span></div>
+        <div class="comp-bullet"><span class="comp-bullet-dot" style="color:${col}">◆</span><span><strong>Magnesium tonight is critical</strong> — unfamiliar beds make sleep lighter. Magnesium activates the parasympathetic system.</span></div>`},
+      mindset:{emoji:'🧠',title:'Mindset',body:`
+        <div class="comp-bullet"><span class="comp-bullet-dot" style="color:${col}">◆</span><span><strong>Tonight is not about performing.</strong> Your only job today is to arrive and rest. Everything else is already done.</span></div>
+        <div class="comp-bullet"><span class="comp-bullet-dot" style="color:${col}">◆</span><span><strong>If you feel anxious:</strong> that is correct. Your body is preparing. That is the same adrenaline that will make you faster tomorrow. It is not a problem — it is preparation.</span></div>
+        <div class="comp-bullet"><span class="comp-bullet-dot" style="color:${col}">◆</span><span><strong>Before sleep:</strong> write 3 things you're grateful for. Small things are fine. This is not a ritual — it is a neurological reset that moves your nervous system out of threat-detection mode.</span></div>
+        <div class="comp-bullet"><span class="comp-bullet-dot" style="color:${col}">◆</span><span>Avoid deep tactical analysis tonight. You know what to do. Trust the training.</span></div>`},
+      focus:{emoji:'🎯',title:'Focus Prep',body:`
+        <div class="comp-bullet"><span class="comp-bullet-dot" style="color:${col}">◆</span><span>Your cue word for tomorrow: <strong style="color:var(--accent);font-size:14px;letter-spacing:1px">${cue}</strong></span></div>
+        <div class="comp-bullet"><span class="comp-bullet-dot" style="color:${col}">◆</span><span>On the journey, run through your touch reset protocol mentally: exhale → feet → <strong>${cue}</strong> → eyes up. Ingrain the pattern before you need it.</span></div>
+        <div class="comp-bullet"><span class="comp-bullet-dot" style="color:${col}">◆</span><span>Think about one tactical strength you want to use tomorrow. Just one. Not a game plan — one weapon you trust.</span></div>`},
+    },
+    eve:{
+      nutrition:{emoji:'🍽',title:'Competition Eve Nutrition',body:`
+        <div class="comp-bullet"><span class="comp-bullet-dot" style="color:${col}">◆</span><span><strong>Dinner by 7pm:</strong> big pasta or rice meal. Familiar recipe. Moderate protein (chicken, fish). Low fat. Low fiber. Nothing adventurous.</span></div>
+        <div class="comp-bullet"><span class="comp-bullet-dot" style="color:${col}">◆</span><span><strong>Hydration:</strong> drink 500ml extra today. Urine should be pale yellow by this evening. You are pre-loading for tomorrow.</span></div>
+        <div class="comp-bullet"><span class="comp-bullet-dot" style="color:${col}">◆</span><span><strong>Snack before bed</strong> if hungry: banana + almond butter. Small. Nothing that requires digestion effort.</span></div>
+        <div class="comp-bullet"><span class="comp-bullet-dot" style="color:${col}">◆</span><span>No alcohol. No heavy dessert. No caffeine after 2pm. No new foods. Your gut needs to be calm tomorrow.</span></div>`},
+      sleep:{emoji:'😴',title:'Sleep Ritual',body:`
+        <div class="comp-bullet"><span class="comp-bullet-dot" style="color:${col}">◆</span><span><strong>Screens off by 9:30pm.</strong> This is non-negotiable. The nervous system needs time to downshift.</span></div>
+        <div class="comp-bullet"><span class="comp-bullet-dot" style="color:${col}">◆</span><span><strong>Magnesium 1 hour before sleep</strong> — tonight more than any other night.</span></div>
+        <div class="comp-bullet"><span class="comp-bullet-dot" style="color:${col}">◆</span><span><strong>Box breathing to fall asleep:</strong> inhale 4s · hold 4s · exhale 4s · hold 4s. Repeat 5 rounds. This activates the vagus nerve and slows heart rate within 2 minutes.</span></div>
+        <div class="comp-bullet"><span class="comp-bullet-dot" style="color:${col}">◆</span><span><strong>Pre-competition sleep is often broken.</strong> That is normal. Even 5–6 broken hours is enough with your fitness level. The anxiety about sleep is worse than the lost sleep itself.</span></div>
+        <div class="comp-bullet"><span class="comp-bullet-dot" style="color:${col}">◆</span><span>If your mind races: write every worry on paper, then close the notebook. It has been filed. It can wait until after the competition.</span></div>`},
+      mindset:{emoji:'🧠',title:'Mindset',body:`
+        <div class="comp-bullet"><span class="comp-bullet-dot" style="color:${col}">◆</span><span><strong>Your preparation is complete.</strong> You do not need to do anything tonight except rest. The work is done. Tomorrow is the delivery.</span></div>
+        <div class="comp-bullet"><span class="comp-bullet-dot" style="color:${col}">◆</span><span><strong>5-min visualization in bed:</strong> see yourself competing well. Moving fast. Making good decisions. Scoring key touches. Don't force a perfect narrative — just let it play.</span></div>
+        <div class="comp-bullet"><span class="comp-bullet-dot" style="color:${col}">◆</span><span><strong>Focus on process, not result.</strong> The score takes care of itself when the actions are right. Tomorrow you are not thinking about winning — you are thinking about fencing.</span></div>
+        <div class="comp-bullet"><span class="comp-bullet-dot" style="color:${col}">◆</span><span>What Valentina Vezzali — 6× World Champion — did the night before every competition: reviewed 5 tactical scenarios, not outcomes. Then slept. That's all.</span></div>`},
+      focus:{emoji:'🎯',title:'Focus & Mental Prep',body:`
+        <div class="comp-bullet"><span class="comp-bullet-dot" style="color:${col}">◆</span><span>Review your cue word one final time: <strong style="color:var(--accent);font-size:14px;letter-spacing:1px">${cue}</strong></span></div>
+        <div class="comp-bullet"><span class="comp-bullet-dot" style="color:${col}">◆</span><span>Tomorrow your only job during each bout is: <strong>exhale after every touch → reset → ${cue} → eyes on opponent.</strong> Score takes care of itself.</span></div>
+        <div class="comp-bullet"><span class="comp-bullet-dot" style="color:${col}">◆</span><span>Review one tactical plan for tomorrow. One specific action you will execute confidently when you don't know what else to do. Your anchor move.</span></div>`},
+    },
+    race:{
+      nutrition:{emoji:'🍽',title:'Nutrition All Day',body:`
+        <div class="comp-bullet"><span class="comp-bullet-dot" style="color:${col}">◆</span><span><strong>Morning meal (2–3h before first bout):</strong> oats + banana + honey + protein shake, OR 2 eggs + toast + juice. Moderate size — not stuffed.</span></div>
+        <div class="comp-bullet"><span class="comp-bullet-dot" style="color:${col}">◆</span><span><strong>Coffee timing:</strong> 45–60 min before your first bout, not immediately after waking. Caffeine peaks at 60 min. Too early and it fades. Too late and your hands shake.</span></div>
+        <div class="comp-bullet"><span class="comp-bullet-dot" style="color:${col}">◆</span><span><strong>After pools:</strong> banana + rice cakes + isotonic drink or juice. Within 30 min. This is the most missed meal of the day and it costs people their DE.</span></div>
+        <div class="comp-bullet"><span class="comp-bullet-dot" style="color:${col}">◆</span><span><strong>Every 2 hours of waiting:</strong> small snack — dates, cereal bar, banana. Not heavy. Not nothing. The energy for the final is built during the pools.</span></div>
+        <div class="comp-bullet"><span class="comp-bullet-dot" style="color:${col}">◆</span><span><strong>30 min before each DE bout:</strong> rice cakes + sports drink. Don't fence hungry. Ever.</span></div>
+        <div class="comp-bullet"><span class="comp-bullet-dot" style="color:${col}">◆</span><span><strong>Water every 30 min.</strong> Dehydration at 2% reduces reaction speed measurably. A fencer who isn't drinking is giving away touches.</span></div>
+        <div class="comp-bullet"><span class="comp-bullet-dot" style="color:${col}">◆</span><span><strong>Avoid:</strong> more coffee after 1pm (crash), anything fried or heavy (blood goes to digestion), too much sugar at once (insulin spike then drop).</span></div>`},
+      warmup:{emoji:'⚡',title:'Warm-Up Protocol',body:`
+        <div class="comp-bullet"><span class="comp-bullet-dot" style="color:${col}">◆</span><span><strong>30–40 min before first bout:</strong></span></div>
+        <div class="comp-bullet"><span class="comp-bullet-dot" style="color:${col}">◆</span><span>5 min footwork: advances, retreats, lunge series, explosive attacks. Get the legs warm.</span></div>
+        <div class="comp-bullet"><span class="comp-bullet-dot" style="color:${col}">◆</span><span>3 min shadow fencing: your key attacks, your parry-riposte, your feint-disengage. Feel the blade.</span></div>
+        <div class="comp-bullet"><span class="comp-bullet-dot" style="color:${col}">◆</span><span>Light sweat = body temperature raised = reaction time 8–12% faster. If you're cold, you're slow.</span></div>
+        <div class="comp-bullet"><span class="comp-bullet-dot" style="color:${col}">◆</span><span>5 rounds of box breathing before you put on the mask for the first time: in 4 · hold 4 · out 4 · hold 4.</span></div>
+        <div class="comp-bullet"><span class="comp-bullet-dot" style="color:${col}">◆</span><span>One tactical intention for this bout. One. Specific. Actionable. Not "fence well" — "attack with feint-disengage if they hang in sixte."</span></div>`},
+      focus:{emoji:'🎯',title:'Focus Reset — Mid-Match',body:`
+        <div style="font-size:12px;color:var(--muted);margin-bottom:10px;line-height:1.5">You lose concentration mid-match. Here is the protocol you run after <em>every single touch</em> — win or lose:</div>
+        <div class="focus-reset-box">
+          <div class="focus-step">
+            <div class="focus-step-num" style="background:rgba(232,84,84,.15);color:var(--red)">1</div>
+            <div class="focus-step-text"><strong>EXHALE</strong><div class="focus-step-sub">One long breath out. This is not optional. It resets the nervous system in 2 seconds.</div></div>
+          </div>
+          <div class="focus-step">
+            <div class="focus-step-num" style="background:rgba(232,184,75,.15);color:var(--yellow)">2</div>
+            <div class="focus-step-text"><strong>FEET</strong><div class="focus-step-sub">Check your stance. Feel the floor. Adjust your weight. This brings your attention from your head back into your body.</div></div>
+          </div>
+          <div class="focus-step">
+            <div class="focus-step-num" style="background:rgba(61,155,233,.15);color:var(--accent)">3</div>
+            <div class="focus-step-text"><strong style="font-size:16px;letter-spacing:2px;color:var(--accent)">${cue}</strong><div class="focus-step-sub">Your word. Say it internally. It means: I am here. I am sharp. Only this touch.</div></div>
+          </div>
+          <div class="focus-step">
+            <div class="focus-step-num" style="background:rgba(76,175,130,.15);color:var(--green)">4</div>
+            <div class="focus-step-text"><strong>EYES UP</strong><div class="focus-step-sub">Look at your opponent. Not the scoreboard. Not the crowd. Them. The next touch starts now.</div></div>
+          </div>
+        </div>
+        <div style="margin-top:10px;font-size:11px;color:var(--muted);line-height:1.5;background:var(--card2);border-radius:8px;padding:10px">
+          <strong style="color:var(--text)">The rule:</strong> There is no match. There is only this touch. Always only this touch. The score is information — it is not your job. Your job is the next touch.
+        </div>
+        <div style="margin-top:8px;font-size:11px;color:var(--muted);line-height:1.5">If losing: <strong style="color:var(--text)">slow down</strong>. Don't rush. Rushing when losing is how you give away 3 more touches. Go back to your anchor move — the one thing you trust.</div>`},
+      between:{emoji:'⏳',title:'Between Bouts',body:`
+        <div class="comp-bullet"><span class="comp-bullet-dot" style="color:${col}">◆</span><span><strong>Stay warm.</strong> Don't sit in the cold. Keep moving lightly. A cold muscle is a slow muscle.</span></div>
+        <div class="comp-bullet"><span class="comp-bullet-dot" style="color:${col}">◆</span><span><strong>Eat small.</strong> Even if you don't feel hungry. Adrenaline suppresses appetite — but your muscles are burning through glycogen.</span></div>
+        <div class="comp-bullet"><span class="comp-bullet-dot" style="color:${col}">◆</span><span><strong>Don't over-analyze the last bout.</strong> 2–3 tactical notes maximum. Then close it. You cannot change what happened. You can change the next bout.</span></div>
+        <div class="comp-bullet"><span class="comp-bullet-dot" style="color:${col}">◆</span><span><strong>What elite fencers do between DEs:</strong> light footwork, water, one small snack, short mental reset. NOT drilling, NOT anxious reviewing of video, NOT talking to too many people. Rest and refuel.</span></div>
+        <div class="comp-bullet"><span class="comp-bullet-dot" style="color:${col}">◆</span><span><strong>Before the next bout:</strong> back to the pre-bout protocol. 5 breaths. One tactical intention. ${cue}. Every time.</span></div>`},
+    },
+    recovery:{
+      nutrition:{emoji:'🍽',title:'Recovery Nutrition',body:`
+        <div class="comp-bullet"><span class="comp-bullet-dot" style="color:${col}">◆</span><span><strong>Recovery meal within 60 min</strong> if you haven't already: protein + carbs. Chicken + rice, sandwich + shake, whatever is available. Eat even if you're not hungry — adrenaline suppresses appetite.</span></div>
+        <div class="comp-bullet"><span class="comp-bullet-dot" style="color:${col}">◆</span><span><strong>Rehydrate:</strong> 500–750ml of water with electrolytes if possible. You lost more than you think.</span></div>
+        <div class="comp-bullet"><span class="comp-bullet-dot" style="color:${col}">◆</span><span>Back to normal eating today. Don't under-eat in "recovery mode" — your body needs nutrients to repair.</span></div>
+        <div class="comp-bullet"><span class="comp-bullet-dot" style="color:${col}">◆</span><span>All supplements back to normal. Magnesium tonight — your muscles need it after yesterday's output.</span></div>`},
+      rest:{emoji:'😴',title:'Rest & Movement',body:`
+        <div class="comp-bullet"><span class="comp-bullet-dot" style="color:${col}">◆</span><span><strong>Zero gym today.</strong> Your body needs integration time. This is not weakness — this is how adaptation happens.</span></div>
+        <div class="comp-bullet"><span class="comp-bullet-dot" style="color:${col}">◆</span><span>Easy movement is good: a 20-min walk, gentle yoga, foam rolling. Active recovery beats complete rest.</span></div>
+        <div class="comp-bullet"><span class="comp-bullet-dot" style="color:${col}">◆</span><span>How you feel today does not reflect how you fenced. Adrenaline crashes are real. You may feel flat, heavy, or emotional. All of this is normal.</span></div>`},
+      mindset:{emoji:'🧠',title:'Debrief',body:`
+        <div class="comp-bullet"><span class="comp-bullet-dot" style="color:${col}">◆</span><span><strong>Three questions tonight.</strong> Not a full analysis. Three questions and close it:</span></div>
+        <div style="background:var(--card2);border-radius:8px;padding:12px;margin:8px 0">
+          <div style="font-size:12px;color:var(--text);margin-bottom:8px">1. <strong>What action am I most proud of?</strong> <span style="color:var(--muted)">(Not result — action)</span></div>
+          <div style="font-size:12px;color:var(--text);margin-bottom:8px">2. <strong>What one moment would I change, and how?</strong> <span style="color:var(--muted)">(Specific, actionable)</span></div>
+          <div style="font-size:12px;color:var(--text)">3. <strong>What did I learn about my fencing?</strong> <span style="color:var(--muted)">(Something you didn't know before)</span></div>
+        </div>
+        <div class="comp-bullet"><span class="comp-bullet-dot" style="color:${col}">◆</span><span>Celebrate the effort. Win or lose, you competed. That matters more than the result at this stage of your career.</span></div>
+        <div class="comp-bullet"><span class="comp-bullet-dot" style="color:${col}">◆</span><span>Tomorrow: one tactical thing to improve before the next competition. Write it down. Then let yesterday go.</span></div>`},
+      focus:{emoji:'🎯',title:'Mental Reset',body:`
+        <div class="comp-bullet"><span class="comp-bullet-dot" style="color:${col}">◆</span><span>How did the touch reset work? Did you use <strong style="color:var(--accent)">${cue}</strong>? When did it work best? When did you forget it? These observations are training data.</span></div>
+        <div class="comp-bullet"><span class="comp-bullet-dot" style="color:${col}">◆</span><span>If you lost focus at a specific moment — write it down. Not to dwell, but to recognize the pattern so you can train around it.</span></div>
+        <div class="comp-bullet"><span class="comp-bullet-dot" style="color:${col}">◆</span><span>The mental game is a skill like any other. It gets better with deliberate practice, not just with wishing.</span></div>`},
+    },
+  };
+
+  const ps = sections[phase];
+  const sectionKeys = Object.keys(ps);
+
+  let sectionsHTML = sectionKeys.map(key => {
+    const s = ps[key];
+    const id = `cs-${phase}-${key}`;
+    return `
+      <div class="comp-section-head" onclick="toggleCompSection('${id}')">
+        <div class="comp-section-title">${s.emoji} ${s.title}</div>
+        <span data-chevron="${id}" style="color:var(--muted);font-size:12px">▸</span>
+      </div>
+      <div id="${id}" class="comp-section-body" style="display:none">${s.body}</div>`;
+  }).join('');
+
+  const nowList = nowItems[phase].map(t=>`
+    <div class="comp-now-item">
+      <div class="comp-now-dot" style="background:${col}"></div>
+      <div style="flex:1">${t}</div>
+    </div>`).join('');
+
+  const bgGradient = {
+    prep:'linear-gradient(135deg,rgba(232,131,75,.12) 0%,rgba(12,13,16,0) 70%)',
+    travel:'linear-gradient(135deg,rgba(232,184,75,.1) 0%,rgba(12,13,16,0) 70%)',
+    eve:'linear-gradient(135deg,rgba(232,131,75,.12) 0%,rgba(12,13,16,0) 70%)',
+    race:'linear-gradient(135deg,rgba(232,84,84,.14) 0%,rgba(12,13,16,0) 70%)',
+    recovery:'linear-gradient(135deg,rgba(76,175,130,.1) 0%,rgba(12,13,16,0) 70%)',
+  };
+
+  return `<div class="comp-guide" style="background:${bgGradient[phase]};border-color:${col}33">
+    <div class="comp-guide-header" style="border-bottom:1px solid ${col}22">
+      <div>
+        <div class="comp-guide-name">${phaseEmoji[phase]} ${comp.name} ${comp.emoji}</div>
+        <div class="comp-guide-sub">${comp.date}</div>
+      </div>
+      <div class="comp-guide-phase" style="background:${col}22;color:${col};border:1px solid ${col}44">${phaseLabels[phase]}</div>
+    </div>
+    <div class="comp-guide-body">
+      <div class="comp-now">${nowList}</div>
+      ${sectionsHTML}
+    </div>
+  </div>`;
+}
+
 
 // ═══════════════════════════════════════════
 //  INIT
@@ -2328,7 +2591,6 @@ document.addEventListener('DOMContentLoaded', ()=>{
   updateHeader();
   setInterval(updateHeader, 60000);
   renderToday();
-  initNotifications();
 });
 </script>
 </body>
