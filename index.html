@@ -533,7 +533,7 @@ const QUOTES = [
 const PLAN = [
   // ══ PHASE 1: COMPETITION READY (W1-3) ══
   {ph:1,lbl:'W1',gym:1,sessions:3,fencing:1,days:[
-    {am:{t:'rest',n:'Rest',d:'Program starts Thursday — rest and prepare mentally',dur:''},pm:null},
+    {am:{t:'rest',n:'Rest',d:'Program starts Friday — rest, prepare mentally, check your gear',dur:''},pm:null},
     {am:{t:'rest',n:'Rest',d:'',dur:''},pm:null},
     {am:{t:'rest',n:'Rest',d:'',dur:''},pm:null},
     {am:{t:'strength',n:'Power Lower A — Intro',d:'Hip thrust 3×12 @35kg · Leg press 3×12 @55kg · Box jumps 3×5 BW · Nordic 2×8 · Calf raises 3×15 · Hip prehab: clamshells 2×15/side',dur:'50m'},pm:{t:'fencing',n:'Fencing PM',d:'Normal coach session',dur:'90m'}},
@@ -1530,17 +1530,24 @@ async function renderPlan() {
     navHTML+=`<button class="wbtn ${i===planWeekIdx?'active':''}" onclick="selectPlanWeek(${i})"><span style="${isPast?'color:var(--green)':''}"> ${isPast?'✓':''}</span>${w.lbl}</button>`;
   });
 
+  // Offset plan columns by the day-of-week PROGRAM_START falls on (May 26 2026 = Tuesday → startDow=1)
+  const _psDate = new Date(PROGRAM_START+'T12:00:00');
+  const startDow = (_psDate.getDay()+6)%7; // Mon=0,Tue=1,...,Sun=6
+
   const gridHTML = dayNames.map((d,i) => {
-    const day=week.days[i]; const isToday=isCurrentWeek&&info&&info.dayIdx===i;
-    const isPastDay = info&&(planWeekIdx<info.weekIdx||(planWeekIdx===info.weekIdx&&i<info.dayIdx));
-    const rawAm=resolveSession(planWeekIdx,i,'am'); const rawPm=resolveSession(planWeekIdx,i,'pm');
-    const movedOutAm=rawAm===null&&isMovedOut(planWeekIdx,i,'am');
-    const movedOutPm=rawPm===null&&isMovedOut(planWeekIdx,i,'pm');
+    const dIdx = i - startDow; // e.g. Fri col (i=4) with startDow=1 → dIdx=3
+    const day=(dIdx>=0&&dIdx<week.days.length)?week.days[dIdx]:null;
+    const isToday=isCurrentWeek&&info&&info.dayIdx===dIdx;
+    const isPastDay = info&&(planWeekIdx<info.weekIdx||(planWeekIdx===info.weekIdx&&dIdx<info.dayIdx));
+    if (!day) return `<div class="dcol"><div class="dhead">${d}</div></div>`;
+    const rawAm=resolveSession(planWeekIdx,dIdx,'am'); const rawPm=resolveSession(planWeekIdx,dIdx,'pm');
+    const movedOutAm=rawAm===null&&isMovedOut(planWeekIdx,dIdx,'am');
+    const movedOutPm=rawPm===null&&isMovedOut(planWeekIdx,dIdx,'pm');
     const resolvedAm=rawAm??day.am; const resolvedPm=rawPm??day.pm;
-    const [logWAm,logDAm,logSAm]=resolveLogContext(planWeekIdx,i,'am');
-    const [logWPm,logDPm,logSPm]=resolveLogContext(planWeekIdx,i,'pm');
-    const amBlock=buildSmallBlock(resolvedAm,planWeekIdx,i,'am',isDone(i,'am'),!!day.pm,movedOutAm,isPastDay,logWAm,logDAm,logSAm);
-    const pmBlock=(resolvedPm||movedOutPm)?buildSmallBlock(resolvedPm||{t:'rest',n:'Moved'},planWeekIdx,i,'pm',isDone(i,'pm'),true,movedOutPm,isPastDay,logWPm,logDPm,logSPm):'';
+    const [logWAm,logDAm,logSAm]=resolveLogContext(planWeekIdx,dIdx,'am');
+    const [logWPm,logDPm,logSPm]=resolveLogContext(planWeekIdx,dIdx,'pm');
+    const amBlock=buildSmallBlock(resolvedAm,planWeekIdx,dIdx,'am',isDone(dIdx,'am'),!!day.pm,movedOutAm,isPastDay,logWAm,logDAm,logSAm);
+    const pmBlock=(resolvedPm||movedOutPm)?buildSmallBlock(resolvedPm||{t:'rest',n:'Moved'},planWeekIdx,dIdx,'pm',isDone(dIdx,'pm'),true,movedOutPm,isPastDay,logWPm,logDPm,logSPm):'';
     return `<div class="dcol ${isToday?'today-col':''}"><div class="dhead">${d}</div>${amBlock}${pmBlock}</div>`;
   }).join('');
 
@@ -1797,9 +1804,14 @@ async function saveLogSession() {
   }
 
   try {
-    await sb.from('session_logs').insert({date,week_idx:wIdx,day_idx:dIdx,slot,type:s.t,name:s.n,data});
+    const {error:insertErr} = await sb.from('session_logs').insert({date,week_idx:wIdx,day_idx:dIdx,slot,type:s.t,name:s.n,data});
+    if (insertErr) {
+      console.error('[saveLogSession]', insertErr);
+      showToast('Error saving: ' + (insertErr.message||'check Supabase'));
+      return;
+    }
     showToast('Session saved ✓');
-  } catch(e) { showToast('Error saving — check Supabase connection'); console.error(e); }
+  } catch(e) { showToast('Error saving — check Supabase connection'); console.error(e); return; }
   closeModal();
   if (activePanel==='today') renderToday();
   if (activePanel==='plan')  renderPlan();
@@ -1811,7 +1823,9 @@ async function markDone(wIdx, dIdx, slot) {
   if (!s) return;
   const sDate=sessionDate(wIdx,dIdx);
   if (isPastSession(wIdx,dIdx)) { if (!confirm(`This session was on ${sDate}. Mark done in historical log?`)) return; }
-  await sb.from('session_logs').insert({date:sDate,week_idx:wIdx,day_idx:dIdx,slot,type:s.t,name:s.n,data:{completed:true}});
+  const {error:mErr} = await sb.from('session_logs').insert({date:sDate,week_idx:wIdx,day_idx:dIdx,slot,type:s.t,name:s.n,data:{completed:true}});
+  if (mErr) { showToast('Error: ' + (mErr.message||'check Supabase')); console.error(mErr); return; }
+  showToast('Marked done ✓');
   if (activePanel==='today') renderToday();
   if (activePanel==='plan')  renderPlan();
 }
@@ -1920,7 +1934,7 @@ async function saveCustomSession() {
   const dur   = document.getElementById('cs-dur')?.value||'';
   const notes = document.getElementById('cs-notes')?.value||'';
   const info  = getTodayInfo();
-  await sb.from('session_logs').insert({
+  const {error:csErr} = await sb.from('session_logs').insert({
     date:todayStr(),
     week_idx: info?.weekIdx??0,
     day_idx:  info?.dayIdx??0,
@@ -1928,6 +1942,7 @@ async function saveCustomSession() {
     type, name,
     data:{duration:parseInt(dur)||null,notes},
   });
+  if (csErr) { showToast('Error: ' + (csErr.message||'check Supabase')); console.error(csErr); return; }
   showToast('Session logged ✓');
   closeModal();
   if (activePanel==='today') renderToday();
